@@ -1,0 +1,28 @@
+{
+    "recommendations": [
+
+        // Cursor recommended https://docs.cursor.com/guides/languages/python
+        "ms-python.python",           // Base Python: debugging, Test Explorer UI, venv integration
+        "ms-python.debugpy",          // Python debugger (breakpoints, stepping)
+        "charliermarsh.ruff",         // Python linter & formatter (Astral ecosystem like UV)
+        "anysphere.cursorpyright",    // Python language server (autocomplete, hover info, etc.)
+
+        // Jupyter notebooks (this project uses notebooks/)
+        "ms-toolsai.jupyter",           // Core Jupyter notebook support
+        "ms-toolsai.jupyter-renderers", // Renderers for Plotly, Vega, and other rich outputs
+
+        // PDF viewing (this project works with PDFs)
+        "mathematic.vscode-pdf",        // View PDFs directly in VS Code
+
+        // Convenient Formatting and Linting
+        "tamasfe.even-better-toml",   // TOML language support (syntax highlighting, validation)
+        "davidanson.vscode-markdownlint",  // Markdown linter (same tool CodeRabbit uses)
+
+        // For VSCode users in place of anysphere.cursorpyright
+        "ms-python.vscode-pylance",
+
+        // Notes:
+        // 1. ms-python.python integrates venv with the IDE, but UV creates it
+        // 2. Ruff doesn't have type checking, CP overlaps some of ruff, control in pyproject.toml
+    ]
+}

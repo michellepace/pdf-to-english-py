@@ -1,0 +1,24 @@
+# Security & Environment
+.env*
+
+# Python core
+__pycache__/
+*.py[oc]
+
+# Virtual environments
+.venv
+
+# Build & Distribution
+dist/
+build/
+*.egg-info/
+
+# Development tools
+.pytest_cache/
+.ruff_cache/
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+
+# Operating system
+.DS_Store
