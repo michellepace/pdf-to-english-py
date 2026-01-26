@@ -13,12 +13,12 @@ dist/
 build/
 *.egg-info/
 
+# Output artifacts
+z_outputs/
+
 # Development tools
 .pytest_cache/
 .ruff_cache/
-
-# Jupyter notebooks
-.ipynb_checkpoints/
 
 # Operating system
 .DS_Store

@@ -43,11 +43,11 @@ This prototype informs the Next.js implementation at [pdf-to-english](https://gi
 
 | # | Hypothesis | Question | Result |
 |---|------------|----------|--------|
-| 1 | Markdown conversion | Does `markdown-it-py` correctly convert OCR output while preserving embedded HTML tables? | |
-| 2 | Translation preserves structure | Does Mistral Large preserve HTML tags and markdown formatting? | |
-| 3 | Table fidelity | Are complex tables (merged cells, nested headers) preserved through the pipeline? | |
-| 4 | Image embedding | Do base64-embedded images render correctly in the final PDF? | |
-| 5 | Visual similarity | Is the output PDF visually similar in structure to the input? | |
+| 1 | Markdown conversion | Does `markdown-it-py` correctly convert OCR output while preserving embedded HTML tables? | ✅ PASS |
+| 2 | Translation preserves structure | Does Mistral Large preserve HTML tags and markdown formatting? | ✅ PASS |
+| 3 | Table fidelity | Are complex tables (merged cells, nested headers) preserved through the pipeline? | ✅ PASS |
+| 4 | Image embedding | Do base64-embedded images render correctly in the final PDF? | ✅ PASS |
+| 5 | Visual similarity | Is the output PDF visually similar in structure to the input? | 🫤 To be improved |
 
 **Test files:**
 

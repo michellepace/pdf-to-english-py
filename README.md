@@ -2,19 +2,14 @@
 
 Prototype Mistral OCR pipeline for [pdf-to-english](https://github.com/michellepace/pdf-to-english).
 
-## 📁 Project Structure
-
-| Path | Description |
-|------|-------------|
-| [.claude/](.claude/) | Claude Code `CLAUDE.md`, rules, settings, commands etc. |
-| .venv/ | Virtual environment created by `uv sync` (gitignored) |
-| [.vscode/](.vscode/) | IDE settings and recommended extensions |
-| [sample_pdfs/](sample_pdfs/) | Sample PDFs for testing |
-| [notebooks/](notebooks/) | Jupyter notebooks saving cleanly to Git |
-| [scripts/](scripts/) | Sometimes you want a standalone script |
-| [src/pdf_to_english_py/](src/pdf_to_english_py/) | Package source code |
-| [tests/](tests/) | Test files mirroring src/ structure |
-| x_docs/ | Research documentation and prompts |
+```text
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  French PDF │ ──> │ Mistral OCR │ ──> │  Translate  │ ──> │  Convert    │ ──> │ English PDF │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+       ↑             markdown+HTML      Mistral Large       markdown-it-py       WeasyPrint  ↓
+       ↑                                                                                     ↓
+  User Upload 🙂                                                              User Download 😁
+```
 
 ## 📦 Installation
 
@@ -43,15 +38,30 @@ Prototype Mistral OCR pipeline for [pdf-to-english](https://github.com/michellep
 
 5. Install the recommended extensions from [.vscode/extensions.json](.vscode/extensions.json).
 
-## 📓 Jupyter Notebook Git Integration (Recommended)
+6. Create a `.env` file in the project root with your Mistral API key:
 
-This project uses [nbstripout](https://github.com/kynan/nbstripout) to keep notebooks clean in Git.
+   ```bash
+   MISTRAL_API_KEY=your_api_key_here
+   ```
 
-**One-time global setup:**
+## 🚀 Running the Application
 
 ```bash
-uv tool install nbstripout
-nbstripout --install --global
+uv run python -m pdf_to_english_py.app
 ```
 
-Any repo with `*.ipynb filter=nbstripout` in `.gitattributes` will automatically strip outputs on commit.
+This launches a Gradio web interface at `http://127.0.0.1:7860` where you can upload French PDFs and download English translations.
+
+## 📁 Project Structure
+
+| Path | Description |
+|------|-------------|
+| [.claude/](.claude/) | Claude Code `CLAUDE.md`, rules, settings, commands etc. |
+| .venv/ | Virtual environment created by `uv sync` (gitignored) |
+| [.vscode/](.vscode/) | IDE settings and recommended extensions |
+| [sample_pdfs/](sample_pdfs/) | Sample PDFs for testing |
+| [notebooks/](notebooks/) | Jupyter notebooks saving cleanly to Git |
+| [scripts/](scripts/) | Sometimes you want a standalone script |
+| [src/pdf_to_english_py/](src/pdf_to_english_py/) | Package source code |
+| [tests/](tests/) | Test files mirroring src/ structure |
+| x_docs/ | Research documentation and prompts |

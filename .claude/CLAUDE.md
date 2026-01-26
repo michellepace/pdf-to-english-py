@@ -20,7 +20,6 @@ UV-based Python 3.14+ with TDD workflow:
 
 - `src/pdf_to_english_py/` — package source code
 - `scripts/` — standalone utilities
-- `notebooks/` — Jupyter notebooks for exploration
 - `tests/` — mirrors `src/` structure
 - `sample_pdfs/` — sample PDFs for testing
 - `x_docs/` — research documentation and prompts
