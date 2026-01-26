@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 TRANSLATION_SYSTEM_PROMPT = """\
 You are a professional translator specialising in document translation.
-Translate the following document from {source_lang} to {target_lang}.
+Translate the following document to British English.
 
 CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:
 
@@ -23,14 +23,12 @@ CRITICAL RULES - YOU MUST FOLLOW THESE EXACTLY:
    - Keep list markers (- or *)
    - Keep code blocks and inline code
 
-3. PRESERVE ALL IMAGE REFERENCES EXACTLY:
-   - Keep ![alt](url) format unchanged
-   - Keep base64 data URIs (data:image/...) exactly as they appear
-   - Do not modify any URLs or file paths
+3. PRESERVE ALL IMAGE PLACEHOLDERS EXACTLY:
+   - Keep ![filename](IMG_PLACEHOLDER_N) format unchanged
+   - Do not modify image filenames or placeholder values
 
 4. ONLY TRANSLATE THE ACTUAL TEXT CONTENT:
    - Translate text inside HTML tags
-   - Translate alt text descriptions
    - Do NOT translate HTML attribute values
    - Do NOT translate URLs, file paths, or code
 
@@ -84,15 +82,13 @@ def restore_images(markdown: str, images: dict[str, str]) -> str:
 def translate_markdown(
     markdown: str,
     client: Mistral,
-    source_lang: str = "French",
-    target_lang: str = "English",
 ) -> str:
     """Translate markdown content while preserving HTML and formatting.
 
     Uses Mistral Large with explicit prompting to preserve:
     - HTML tags (tables with colspan/rowspan)
     - Markdown formatting (headers, bold, lists)
-    - Image references (base64 data URIs)
+    - Image placeholders (IMG_PLACEHOLDER_N)
 
     Base64 images are stripped before translation and restored after to reduce
     token usage — images don't need translation.
@@ -100,24 +96,17 @@ def translate_markdown(
     Args:
         markdown: Source markdown with embedded HTML tables and images.
         client: Mistral API client.
-        source_lang: Source language name.
-        target_lang: Target language name.
 
     Returns:
-        Translated markdown with all formatting preserved.
+        Markdown translated to British English with all formatting preserved.
     """
     # Strip base64 images to reduce token usage
     stripped_markdown, images = strip_images(markdown)
 
-    system_prompt = TRANSLATION_SYSTEM_PROMPT.format(
-        source_lang=source_lang,
-        target_lang=target_lang,
-    )
-
     response = client.chat.complete(
         model="mistral-large-latest",
         messages=[
-            {"role": "system", "content": system_prompt},
+            {"role": "system", "content": TRANSLATION_SYSTEM_PROMPT},
             {"role": "user", "content": stripped_markdown},
         ],
     )

@@ -359,23 +359,9 @@ uv run pytest -v -m integration       # Integration tests (needs API key)
 
 ---
 
-## ⚠️ REQUIRED REFACTORS
+## ⚠️ PROPOSED REFACTORS
 
-### 1. Language Detection (MEDIUM PRIORITY)
-
-**Problem:** If user uploads an English document, we still send it for "French→English" translation, wasting API calls and potentially altering the text.
-
-**Fix:** Add language detection before translation, skip if already in target language.
-
-**Options:**
-
-- Use `langdetect` library (lightweight, local)
-- Use Mistral's chat to detect language (uses API tokens)
-- Add UI dropdown for user to specify source language
-
----
-
-### 2. Code Block Protection (LOW PRIORITY)
+### 1. Code Block Protection (LOW PRIORITY)
 
 **Problem:** The prompt asks LLM not to translate code, but this is best-effort.
 
