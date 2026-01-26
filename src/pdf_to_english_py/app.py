@@ -158,7 +158,10 @@ def create_app() -> gr.Blocks:
 def main() -> None:
     """Entry point for the application."""
     app = create_app()
-    app.launch()
+    app.launch(
+        server_name="0.0.0.0",  # noqa: S104 - Required for Railway deployment
+        server_port=int(os.environ.get("PORT", "7860")),
+    )
 
 
 if __name__ == "__main__":

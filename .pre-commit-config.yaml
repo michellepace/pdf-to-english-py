@@ -15,6 +15,14 @@ repos:
 
   - repo: local
     hooks:
+      # Generate requirements.txt for Railway deployment
+      - id: generate-requirements
+        name: generate requirements.txt
+        entry: bash -c 'uv pip compile pyproject.toml -o requirements.txt && git add requirements.txt'
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false
+
       # Type checking (uses uv run to access project venv)
       - id: pyright
         name: pyright
@@ -37,3 +45,4 @@ repos:
 # 3. `--exit-non-zero-on-fix` flag blocks commits when ruff makes automatic fixes, must review first
 # 4. `pyright` uses `uv run` to access project venv (required for third-party imports)
 # 5. `pass_filenames: false` makes pytest run all tests rather than only testing modified files
+# 6. `generate-requirements` auto-generates requirements.txt for Railway when pyproject.toml changes

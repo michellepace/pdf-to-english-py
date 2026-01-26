@@ -22,6 +22,8 @@ Prototype Mistral OCR pipeline for [pdf-to-english](https://github.com/michellep
 | [Gradio](https://www.gradio.app/) | Provides the web interface for uploading and downloading PDFs. |
 | [Python 3.14+](https://www.python.org/) | Runtime with modern type hints and performance improvements. |
 
+**Dev tools:** pytest, ruff, pyright. Deployed on [Railway](https://railway.app/).
+
 ## 📁 Project Structure
 
 | Path | Description |
