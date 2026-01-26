@@ -13,14 +13,16 @@ repos:
       - id: ruff-check
         args: [--fix, --exit-non-zero-on-fix]
 
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.407
-    hooks:
-      # Type checking
-      - id: pyright
-
   - repo: local
     hooks:
+      # Type checking (uses uv run to access project venv)
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        types: [python]
+        pass_filenames: false
+
       # Run all tests
       - id: pytest
         name: pytest
@@ -33,5 +35,5 @@ repos:
 # 1. `uv-lock` hook automatically updates the lockfile to ensure it matches specs in pyproject.toml
 # 2. `ruff-format` runs before `ruff-check` (format then lint)
 # 3. `--exit-non-zero-on-fix` flag blocks commits when ruff makes automatic fixes, must review first
-# 4. `pyright` runs type checking to catch type errors before commits
+# 4. `pyright` uses `uv run` to access project venv (required for third-party imports)
 # 5. `pass_filenames: false` makes pytest run all tests rather than only testing modified files
