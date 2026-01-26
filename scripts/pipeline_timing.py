@@ -117,7 +117,7 @@ def step_render(markdown: str, output_path: Path) -> Path:
 def main() -> None:
     """Run the full PDF processing pipeline with timing for each step."""
     pdf_path = args.pdf_path
-    output_path = Path(f"test_outputs/{pdf_path.stem}_timed.pdf")
+    output_path = Path(f"output_pdfs/{pdf_path.stem}_timed.pdf")
     output_path.parent.mkdir(exist_ok=True)
 
     print(f"📄 Processing: {pdf_path}")

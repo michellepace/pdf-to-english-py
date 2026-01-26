@@ -14,7 +14,7 @@ build/
 *.egg-info/
 
 # Output artifacts
-z_outputs/
+output_pdfs/
 
 # Development tools
 .pytest_cache/

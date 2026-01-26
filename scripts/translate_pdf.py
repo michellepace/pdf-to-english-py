@@ -18,7 +18,7 @@ from pdf_to_english_py.translate import translate_markdown
 load_dotenv()
 
 input_path = Path(sys.argv[1])
-output_dir = Path("z_outputs")
+output_dir = Path("output_pdfs")
 output_dir.mkdir(exist_ok=True)
 output_path = output_dir / f"{input_path.stem}_EN.pdf"
 client = Mistral(api_key=os.environ["MISTRAL_API_KEY"])
