@@ -4,10 +4,14 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import gradio as gr
 from dotenv import load_dotenv
 from mistralai import Mistral
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 from pdf_to_english_py.ocr import extract_pdf
 from pdf_to_english_py.render import render_pdf
@@ -50,10 +54,15 @@ def process_pdf(
         # Step 2: Translate to English
         translated_markdown = translate_markdown(ocr_result.raw_markdown, client)
 
-        # Step 3: Render to PDF
+        # Step 3: Render to PDF with OCR metadata
         output_filename = f"{input_path.stem}_english.pdf"
         output_path = output_dir / output_filename
-        render_pdf(translated_markdown, output_path)
+        render_pdf(
+            translated_markdown,
+            output_path,
+            images=ocr_result.images,
+            page_dimensions=ocr_result.page_dimensions,
+        )
 
         return str(output_path), "Translation complete!"
 
@@ -63,7 +72,9 @@ def process_pdf(
         return None, f"Error: {e}"
 
 
-def _create_gradio_handler() -> tuple[gr.File, gr.Textbox] | tuple[None, str]:
+def _create_gradio_handler() -> (
+    Callable[[str | None], tuple[str | None, str]] | tuple[None, str]
+):
     """Create a handler function for Gradio that manages the Mistral client.
 
     Returns:
@@ -79,9 +90,6 @@ def _create_gradio_handler() -> tuple[gr.File, gr.Textbox] | tuple[None, str]:
         if pdf_file is None:
             return None, "Please upload a PDF file"
 
-        # Debug: log what Gradio passes
-        print(f"DEBUG: pdf_file type={type(pdf_file)}, value={pdf_file!r}")
-
         # Extract file path - Gradio 3.x passes the path as a string
         if isinstance(pdf_file, str):
             file_path = pdf_file
@@ -89,8 +97,6 @@ def _create_gradio_handler() -> tuple[gr.File, gr.Textbox] | tuple[None, str]:
             file_path = pdf_file.name
         else:
             return None, f"Error: Unexpected file type: {type(pdf_file)}"
-
-        print(f"DEBUG: file_path={file_path}")
 
         # Create temporary directory for output
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -109,7 +115,7 @@ def _create_gradio_handler() -> tuple[gr.File, gr.Textbox] | tuple[None, str]:
             shutil.copy(output_path, persistent_path)
             return str(persistent_path), status
 
-    return handler  # type: ignore[return-value]
+    return handler
 
 
 def create_app() -> gr.Blocks:

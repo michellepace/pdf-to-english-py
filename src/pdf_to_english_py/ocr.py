@@ -2,13 +2,60 @@
 
 import base64
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from mistralai import Mistral
+
+
+@dataclass
+class PageDimensions:
+    """Page dimensions in millimetres, calculated from OCR pixel data."""
+
+    width_mm: float
+    height_mm: float
+
+    @classmethod
+    def from_ocr(cls, width_px: int, height_px: int, dpi: int) -> PageDimensions:
+        """Create PageDimensions from OCR pixel dimensions."""
+        return cls(
+            width_mm=round((width_px / dpi) * 25.4, 1),
+            height_mm=round((height_px / dpi) * 25.4, 1),
+        )
+
+
+@dataclass
+class ImageMetadata:
+    """Metadata for an image extracted from OCR, including sizing info."""
+
+    image_id: str
+    width_percent: float
+
+    @classmethod
+    def from_bounding_box(
+        cls,
+        image_id: str,
+        top_left_x: int,
+        bottom_right_x: int,
+        page_width: int,
+    ) -> ImageMetadata:
+        """Create ImageMetadata from bounding box coordinates.
+
+        Args:
+            image_id: The image identifier (e.g. "img-0.jpeg").
+            top_left_x: X coordinate of top-left corner.
+            bottom_right_x: X coordinate of bottom-right corner.
+            page_width: Width of the page in pixels.
+
+        Returns:
+            ImageMetadata with calculated width_percent.
+        """
+        width_px = bottom_right_x - top_left_x
+        width_percent = (width_px / page_width) * 100
+        return cls(image_id=image_id, width_percent=round(width_percent, 1))
 
 
 @dataclass
@@ -25,6 +72,8 @@ class OcrResult:
 
     pages: list[OcrPage]
     raw_markdown: str  # Combined markdown from all pages
+    images: list[ImageMetadata] = field(default_factory=list)
+    page_dimensions: PageDimensions | None = None
 
 
 def encode_pdf_to_base64(pdf_path: Path) -> str:
@@ -121,7 +170,17 @@ def extract_pdf(pdf_path: Path, client: Mistral) -> OcrResult:
 
     # Process each page
     pages: list[OcrPage] = []
+    all_images: list[ImageMetadata] = []
+    page_dimensions: PageDimensions | None = None
+
     for page in ocr_response.pages:
+        # Capture page dimensions from first page
+        if page_dimensions is None and page.dimensions:
+            page_dimensions = PageDimensions.from_ocr(
+                width_px=page.dimensions.width,
+                height_px=page.dimensions.height,
+                dpi=page.dimensions.dpi,
+            )
         # Start with the raw markdown
         markdown = page.markdown
 
@@ -130,16 +189,34 @@ def extract_pdf(pdf_path: Path, client: Mistral) -> OcrResult:
             tables_data = [{"id": t.id, "content": t.content} for t in page.tables]
             markdown = inline_tables(markdown, tables_data)
 
-        # Inline images if present
+        # Inline images if present and capture metadata
         if page.images:
             images_data = [
                 {"id": img.id, "image_base64": img.image_base64} for img in page.images
             ]
             markdown = inline_images(markdown, images_data)
 
+            # Capture image metadata from bounding boxes (requires page dimensions)
+            if page.dimensions:
+                for img in page.images:
+                    if img.top_left_x is None or img.bottom_right_x is None:
+                        continue
+                    metadata = ImageMetadata.from_bounding_box(
+                        image_id=img.id,
+                        top_left_x=img.top_left_x,
+                        bottom_right_x=img.bottom_right_x,
+                        page_width=page.dimensions.width,
+                    )
+                    all_images.append(metadata)
+
         pages.append(OcrPage(index=page.index, markdown=markdown))
 
     # Combine all pages into raw_markdown
     raw_markdown = "\n\n".join(page.markdown for page in pages)
 
-    return OcrResult(pages=pages, raw_markdown=raw_markdown)
+    return OcrResult(
+        pages=pages,
+        raw_markdown=raw_markdown,
+        images=all_images,
+        page_dimensions=page_dimensions,
+    )

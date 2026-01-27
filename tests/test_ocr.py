@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 from pdf_to_english_py.ocr import (
+    ImageMetadata,
     OcrPage,
     OcrResult,
     encode_pdf_to_base64,
@@ -142,6 +143,41 @@ class TestInlineImages:
         result = inline_images(markdown, images)
 
         assert result == markdown
+
+
+class TestImageMetadata:
+    """Tests for ImageMetadata dataclass."""
+
+    def test_stores_image_id_and_width_percent(self) -> None:
+        """ImageMetadata should store image_id and width_percent."""
+        metadata = ImageMetadata(image_id="img-0.jpeg", width_percent=23.8)
+        assert metadata.image_id == "img-0.jpeg"
+        assert metadata.width_percent == 23.8
+
+    def test_calculates_width_percent_from_bounding_box(self) -> None:
+        """Should calculate width_percent from bounding box coordinates."""
+        metadata = ImageMetadata.from_bounding_box(
+            image_id="img-0.jpeg",
+            top_left_x=152,
+            bottom_right_x=276,
+            page_width=1654,
+        )
+        assert metadata.width_percent == pytest.approx(7.5, rel=0.01)
+
+
+class TestOcrResultWithMetadata:
+    """Tests for OcrResult with image metadata."""
+
+    def test_ocr_result_stores_image_metadata(self) -> None:
+        """OcrResult should store image metadata."""
+        images = [ImageMetadata(image_id="img-0.jpeg", width_percent=7.5)]
+        result = OcrResult(pages=[], raw_markdown="", images=images)
+        assert len(result.images) == 1
+
+    def test_ocr_result_defaults_to_empty_images(self) -> None:
+        """OcrResult should default to empty images list."""
+        result = OcrResult(pages=[], raw_markdown="")
+        assert result.images == []
 
 
 class TestOcrDataClasses:

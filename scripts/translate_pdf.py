@@ -30,6 +30,11 @@ print("Translating...")
 translated_md = translate_markdown(ocr_result.raw_markdown, client)
 
 print("Rendering...")
-render_pdf(translated_md, output_path)
+render_pdf(
+    translated_md,
+    output_path,
+    images=ocr_result.images,
+    page_dimensions=ocr_result.page_dimensions,
+)
 
 print(f"Done: {output_path}")

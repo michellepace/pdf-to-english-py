@@ -25,60 +25,47 @@ def test_processes_multilingual_pdf(
     Tests the complete OCR → translate → render pipeline, asserting that
     key document features are preserved throughout.
     """
-    # Step 1: Extract text using OCR
+    # === Execute pipeline ===
     ocr_result = extract_pdf(e2e_test_pdf, mistral_client)
-
-    # Step 2: Translate to English
     translated_md = translate_markdown(ocr_result.raw_markdown, mistral_client)
-
-    # Step 3: Render to PDF
     output_path = tmp_path / "output.pdf"
-    render_pdf(translated_md, output_path)
+    render_pdf(
+        translated_md,
+        output_path,
+        images=ocr_result.images,
+        page_dimensions=ocr_result.page_dimensions,
+    )
 
-    # === Pipeline completion assertions ===
+    # === Structural assertions ===
     assert output_path.exists()
     assert output_path.stat().st_size > 1000
+    assert len(ocr_result.pages) == 2
+    assert len(ocr_result.images) == 3
 
-    # === High confidence assertions ===
+    # === Page dimensions (A4) ===
+    assert ocr_result.page_dimensions is not None
+    assert ocr_result.page_dimensions.width_mm == pytest.approx(210, rel=0.01)
+    assert ocr_result.page_dimensions.height_mm == pytest.approx(297, rel=0.01)
 
-    # Multi-page: OCR should detect both pages
-    assert len(ocr_result.pages) == 2, "Expected 2 pages from OCR"
+    # === Image metadata ===
+    img_widths = {i.image_id: i.width_percent for i in ocr_result.images}
+    assert img_widths["img-0.jpeg"] == pytest.approx(54.8, rel=0.1)
+    assert img_widths["img-1.jpeg"] == pytest.approx(54.8, rel=0.1)
+    assert img_widths["img-2.jpeg"] == pytest.approx(7.5, rel=0.1)
 
-    # Images: Our strip/restore logic preserves base64 data URIs
-    assert "data:image" in translated_md, "Base64 image should be preserved"
+    # === Content preservation ===
+    assert "data:image" in translated_md  # Base64 images
+    assert "<table" in translated_md.lower()  # HTML tables
+    assert "rowspan" in translated_md.lower()  # Merged cells
+    assert "colspan" in translated_md.lower()
+    assert "€" in translated_md  # Special characters
 
-    # Tables: Mistral OCR outputs tables as HTML
-    assert "<table" in translated_md.lower(), "HTML table should be present"
+    # === Translation verification ===
+    assert "resources and links" in translated_md.lower()  # French → English
+    assert "january" in translated_md.lower()  # Italian → English
 
-    # Merge attributes: Tables have rowspan and colspan
-    assert "rowspan" in translated_md.lower(), "rowspan attribute should be preserved"
-    assert "colspan" in translated_md.lower(), "colspan attribute should be preserved"
-
-    # Special characters: Euro symbol should pass through
-    assert "€" in translated_md, "Euro symbol (€) should be preserved"
-
-    # Translation: French "Ressources et liens" should be translated to English
-    assert "resources and links" in translated_md.lower(), (
-        "French section header should be translated to English"
-    )
-
-    # Translation: German "Die Sonne scheint" should be translated to English
-    # Check for "sun" as translation phrasing may vary (shines/shining/etc)
-    assert "sun" in translated_md.lower(), "German text should be translated to English"
-
-    # === Risky assertions (OCR behaviour dependent) ===
-
-    # Bold: PDF has "This is BOLD" - OCR may output as **BOLD** or lose it
-    assert "**" in translated_md, "Bold markdown (**) should be present"
-
-    # Italic: PDF has "This is italics" - OCR may output as *italic* or lose it
-    # Note: Can't just check for * since it appears in other contexts
-    assert "*" in translated_md, "Italic markdown (*) should be present"
-
-    # Headers: PDF has section headers - OCR may output as # headers
-    assert translated_md.strip().startswith("#") or "\n#" in translated_md, (
-        "Markdown headers (#) should be present"
-    )
-
-    # Links: PDF has "Google Link" hyperlink - format may vary
-    assert "google" in translated_md.lower(), "Google link should be preserved"
+    # === Markdown formatting (OCR dependent) ===
+    assert "**" in translated_md  # Bold
+    assert "*" in translated_md  # Italic
+    assert "#" in translated_md  # Headers
+    assert "google" in translated_md.lower()  # Link text

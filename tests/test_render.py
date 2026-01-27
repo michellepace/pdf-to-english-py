@@ -2,7 +2,9 @@
 
 from typing import TYPE_CHECKING
 
+from pdf_to_english_py.ocr import ImageMetadata
 from pdf_to_english_py.render import (
+    generate_image_css,
     html_to_pdf,
     markdown_to_html,
     render_pdf,
@@ -259,3 +261,51 @@ This document has **bold** and *italic* text.
         assert output_path.exists()
         # Complex document should be larger
         assert output_path.stat().st_size > 2000
+
+
+class TestGenerateImageCss:
+    """Tests for generate_image_css function."""
+
+    def test_generates_css_for_single_image(self) -> None:
+        """Should generate CSS rule for a single image."""
+        images = [ImageMetadata(image_id="img-0.jpeg", width_percent=23.8)]
+        css = generate_image_css(images)
+
+        assert 'img[alt="img-0.jpeg"]' in css
+        assert "width: 23.8%;" in css
+
+    def test_generates_css_for_multiple_images(self) -> None:
+        """Should generate CSS rules for multiple images."""
+        images = [
+            ImageMetadata(image_id="img-0.jpeg", width_percent=7.5),
+            ImageMetadata(image_id="img-1.jpeg", width_percent=54.8),
+        ]
+        css = generate_image_css(images)
+
+        assert 'img[alt="img-0.jpeg"]' in css
+        assert 'img[alt="img-1.jpeg"]' in css
+
+    def test_returns_empty_string_for_no_images(self) -> None:
+        """Should return empty string when no images."""
+        assert generate_image_css([]) == ""
+
+
+class TestRenderPdfWithMetadata:
+    """Tests for render_pdf with image metadata."""
+
+    def test_renders_pdf_with_image_sizing(self, tmp_path: Path) -> None:
+        """Should render PDF with dynamic image sizing."""
+        markdown = "![img-0.jpeg](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==)"
+        images = [ImageMetadata(image_id="img-0.jpeg", width_percent=30.0)]
+        output_path = tmp_path / "output.pdf"
+
+        render_pdf(markdown, output_path, images=images)
+
+        assert output_path.exists()
+
+    def test_renders_pdf_without_metadata_backwards_compatible(
+        self, tmp_path: Path
+    ) -> None:
+        """Should render PDF without images param for backwards compatibility."""
+        render_pdf("# Test", tmp_path / "output.pdf")  # No images param
+        assert (tmp_path / "output.pdf").exists()
