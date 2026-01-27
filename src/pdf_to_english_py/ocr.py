@@ -76,6 +76,18 @@ class OcrResult:
     page_dimensions: PageDimensions | None = None
 
 
+def combine_pages(pages: list[OcrPage]) -> str:
+    """Combine OCR pages into single markdown with horizontal rule separators.
+
+    Args:
+        pages: List of OcrPage objects to combine.
+
+    Returns:
+        Combined markdown with --- separators between pages.
+    """
+    return "\n\n---\n\n".join(page.markdown for page in pages)
+
+
 def encode_pdf_to_base64(pdf_path: Path) -> str:
     """Encode a local PDF file to base64 string.
 
@@ -211,8 +223,8 @@ def extract_pdf(pdf_path: Path, client: Mistral) -> OcrResult:
 
         pages.append(OcrPage(index=page.index, markdown=markdown))
 
-    # Combine all pages into raw_markdown
-    raw_markdown = "\n\n".join(page.markdown for page in pages)
+    # Combine all pages into raw_markdown with separators
+    raw_markdown = combine_pages(pages)
 
     return OcrResult(
         pages=pages,

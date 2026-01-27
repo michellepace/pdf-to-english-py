@@ -9,10 +9,17 @@ from weasyprint import HTML
 if TYPE_CHECKING:
     from pdf_to_english_py.ocr import ImageMetadata, PageDimensions
 
-# Bundled font for consistent rendering across environments
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-FONT_PATH = PROJECT_ROOT / "fonts" / "AtkinsonHyperlegibleNextVF-Variable.ttf"
-FONT_URL = FONT_PATH.as_uri()
+# Bundled fonts for consistent rendering across environments
+FONTS_DIR = Path(__file__).resolve().parents[2] / "fonts"
+
+
+def _font_url(filename: str) -> str:
+    return (FONTS_DIR / filename).as_uri()
+
+
+FONT_URL = _font_url("AtkinsonHyperlegibleNextVF-Variable.ttf")
+FONT_ITALIC_URL = _font_url("AtkinsonHyperlegibleNext-RegularItalic.ttf")
+FONT_BOLD_ITALIC_URL = _font_url("AtkinsonHyperlegibleNext-BoldItalic.ttf")
 
 BASE_CSS = f"""
 @font-face {{
@@ -20,6 +27,20 @@ BASE_CSS = f"""
     src: url("{FONT_URL}") format("truetype");
     font-weight: 100 900;
     font-style: normal;
+}}
+
+@font-face {{
+    font-family: "Atkinson Hyperlegible";
+    src: url("{FONT_ITALIC_URL}") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}}
+
+@font-face {{
+    font-family: "Atkinson Hyperlegible";
+    src: url("{FONT_BOLD_ITALIC_URL}") format("truetype");
+    font-weight: bold;
+    font-style: italic;
 }}
 
 body {{
@@ -35,7 +56,7 @@ table {{
 }}
 
 th, td {{
-    border: 1px solid #333;
+    border: 1px solid #999;
     padding: 4px;
 }}
 """

@@ -129,6 +129,26 @@ class TestWrapWithStyles:
         # Should have table styling
         assert "border" in result
 
+    def test_table_borders_are_medium_grey(self) -> None:
+        """Table borders should be medium grey (#999) for readability."""
+        html_body = "<p>Content</p>"
+
+        result = wrap_with_styles(html_body)
+
+        assert "#999" in result
+        assert "#333" not in result
+
+    def test_italics_use_atkinson_font(self) -> None:
+        """Italic elements should use Atkinson Hyperlegible italic font."""
+        html_body = "<p>Content</p>"
+
+        result = wrap_with_styles(html_body)
+
+        # Should have @font-face for italic variant
+        assert "font-style: italic" in result
+        # Should NOT fall back to system sans-serif for em/i
+        assert "em, i" not in result or "font-family: sans-serif" not in result
+
     def test_preserves_body_content(self) -> None:
         """Body content should be preserved in the output."""
         html_body = "<h1>My Title</h1><p>My paragraph.</p>"

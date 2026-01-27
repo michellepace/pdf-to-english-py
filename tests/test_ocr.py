@@ -12,6 +12,7 @@ from pdf_to_english_py.ocr import (
     ImageMetadata,
     OcrPage,
     OcrResult,
+    combine_pages,
     encode_pdf_to_base64,
     inline_images,
     inline_tables,
@@ -200,3 +201,27 @@ class TestOcrDataClasses:
 
         assert len(result.pages) == 2
         assert result.raw_markdown == "Page 1\n\nPage 2"
+
+
+class TestCombinePages:
+    """Tests for combine_pages helper function."""
+
+    def test_joins_pages_with_horizontal_rule_separator(self) -> None:
+        """Multiple pages should be joined with --- separator."""
+        pages = [
+            OcrPage(index=0, markdown="Page 1 content"),
+            OcrPage(index=1, markdown="Page 2 content"),
+        ]
+
+        result = combine_pages(pages)
+
+        assert result == "Page 1 content\n\n---\n\nPage 2 content"
+
+    def test_single_page_has_no_separator(self) -> None:
+        """Single page should not have separator."""
+        pages = [OcrPage(index=0, markdown="Only page")]
+
+        result = combine_pages(pages)
+
+        assert result == "Only page"
+        assert "---" not in result
