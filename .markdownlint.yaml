@@ -6,6 +6,7 @@ MD013: false  # Line length (inappropriate for markdown)
 MD024: false  # Allow duplicate headings (helpful for consistent section patterns)
 MD033: false  # Allow inline HTML (<details>, <tags>, etc.)
 MD036: false  # Allow emphasis (bold/italic) without treating it as heading
+MD025: false  # Allow multiple top-level headings (common in translated documents)
 MD040: false  # Fenced code blocks don't need language specified
 MD041: false  # First line doesn't need to be h1
 MD060: false  # Table column style (allow compact tables without spaces)
