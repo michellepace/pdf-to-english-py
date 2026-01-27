@@ -1,3 +1,9 @@
+---
+validated_against: All code as of commit a931d44
+validated_by: uv run scripts/investigate_ocr.py sample_pdfs/e2e_test.pdf
+validated_date: 2026-01-27
+---
+
 # HANDOVER: PDF-to-English Translation Prototype
 
 ## What Was Built
@@ -272,32 +278,59 @@ Verify OCR response structure (outputs dimensions, bounding boxes, hyperlinks wi
 uv run scripts/investigate_ocr.py sample_pdfs/e2e_test.pdf
 ```
 
-Sample output (verified January 2026):
+Sample Script Output:
+
+<sample_script_output>
 
 ```json
 {
-  "pages": [{
-    "index": 0,
-    "dimensions": {"dpi": 200, "width": 1654, "height": 2339},
-    "hyperlinks": ["https://www.google.com/", "https://claude.ai/new"],
-    "images": [{
-      "id": "img-0.jpeg",
-      "has_base64": true,
-      "top_left_x": 152, "top_left_y": 1656,
-      "bottom_right_x": 276, "bottom_right_y": 1779,
-      "width_px": 124, "height_px": 123
-    }],
-    "tables_count": 2
-  }]
+  "model": "mistral-ocr-latest",
+  "pages": [
+    {
+      "index": 0,
+      "dimensions": {"dpi": 200, "width": 1654, "height": 2339},
+      "hyperlinks": ["https://www.google.com/", "https://claude.ai/new"],
+      "markdown_preview": "Sivu 1 / 2\n\n# Sujet général du document...",
+      "markdown_length": 1808,
+      "images": [{
+        "id": "img-0.jpeg",
+        "has_base64": true,
+        "top_left_x": 152, "top_left_y": 1656,
+        "bottom_right_x": 276, "bottom_right_y": 1779,
+        "width_px": 124, "height_px": 123
+      }],
+      "tables_count": 2
+    },
+    {
+      "index": 1,
+      "dimensions": {"dpi": 200, "width": 1654, "height": 2339},
+      "hyperlinks": ["https://www.google.com/"],
+      "markdown_preview": "Sivu 2 / 2\n\n[tbl-2.html](tbl-2.html)...",
+      "markdown_length": 1374,
+      "images": [{
+        "id": "img-1.jpeg",
+        "has_base64": true,
+        "top_left_x": 152, "top_left_y": 727,
+        "bottom_right_x": 1058, "bottom_right_y": 912,
+        "width_px": 906, "height_px": 185
+      }],
+      "tables_count": 1
+    }
+  ]
 }
 ```
 
+</sample_script_output>
+
 Key observations:
 
+- `model`: Model identifier returned by the API
 - `dimensions`: Page size in pixels at given DPI (1654×2339 @ 200 DPI = A4)
-- `images`: Bounding box allows calculating pixel dimensions
 - `hyperlinks`: URLs only, no anchor text mapping
-- `tables`: Count only, no bounding box data
+- `markdown_preview`: Truncated preview of extracted markdown (full content in `markdown`)
+- `markdown_length`: Character count of full markdown content
+- `images`: Bounding box allows calculating pixel dimensions
+- `tables_count`: Count only, no bounding box data for tables
 
 ---
 
