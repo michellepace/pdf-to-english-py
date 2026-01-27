@@ -23,9 +23,9 @@ def sample_pdfs_dir(project_root: Path) -> Path:
 
 
 @pytest.fixture
-def french_pdf(sample_pdfs_dir: Path) -> Path:
-    """Path to French test PDF with tables, links, and pictures."""
-    pdf_path = sample_pdfs_dir / "french.pdf"
+def e2e_test_pdf(sample_pdfs_dir: Path) -> Path:
+    """Path to test PDF with tables, links, and pictures."""
+    pdf_path = sample_pdfs_dir / "e2e_test.pdf"
     if not pdf_path.exists():
         pytest.skip(f"Test PDF not found: {pdf_path}")
     return pdf_path

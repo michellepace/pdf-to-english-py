@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Translate a French PDF to English.
+"""Translate a PDF to English.
 
 Usage: uv run scripts/translate_pdf.py <input.pdf>
 """

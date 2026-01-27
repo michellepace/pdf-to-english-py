@@ -4,12 +4,12 @@
 
 Build a Python `Gradio` prototype app as a `uv` project:
 
-- **Input:** User uploads a French PDF
+- **Input:** User uploads a PDF
 - **Output:** User downloads a translated English PDF
 
 **Pipeline:**
 
-1. Extract text from French PDF using `Mistral OCR 3` (with `table_format="html"`)
+1. Extract text from PDF using `Mistral OCR 3` (with `table_format="html"`)
 2. Translate extracted text to English using `mistral-large-latest`
 3. Convert markdown to HTML using `markdown-it-py`
 4. Render translation as downloadable PDF using `WeasyPrint`
@@ -24,7 +24,7 @@ This prototype informs the Next.js implementation at [pdf-to-english](https://gi
 
 ```text
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  French PDF │ ──> │ Mistral OCR │ ──> │  Translate  │ ──> │  Convert    │ ──> │ English PDF │
+│     PDF     │ ──> │ Mistral OCR │ ──> │  Translate  │ ──> │  Convert    │ ──> │ English PDF │
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
        ↑             markdown+HTML      Mistral Large       markdown-it-py       WeasyPrint  ↓
        ↑                                                                                     ↓

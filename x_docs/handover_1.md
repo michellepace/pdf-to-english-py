@@ -2,13 +2,13 @@
 
 ## What Was Built
 
-A Python Gradio app that translates French PDFs to English PDFs using Mistral AI.
+A Python Gradio app that translates PDFs to English PDFs using Mistral AI.
 
 ```text
                     PIPELINE FLOW
 
 ┌──────────────┐
-│  French PDF  │  ← User uploads
+│     PDF      │  ← User uploads
 └──────┬───────┘
        │
        ▼
@@ -62,11 +62,12 @@ src/pdf_to_english_py/
 └── render.py       # markdown-it-py + WeasyPrint PDF generation
 
 tests/
-├── conftest.py     # Shared fixtures (sample PDFs, Mistral client)
-├── test_ocr.py     # 13 tests (11 unit, 2 integration)
-├── test_translate.py # 10 tests (3 unit, 7 integration)
-├── test_render.py  # 15 unit tests
-└── test_app.py     # 5 tests (2 unit, 3 integration)
+├── conftest.py       # Shared fixtures (sample PDFs, Mistral client)
+├── test_ocr.py
+├── test_translate.py
+├── test_render.py
+├── test_app.py
+└── test_e2e.py       # 1 integration test
 ```
 
 ---
@@ -86,16 +87,16 @@ tests/
    │
    ▼
 3. app.py handler() receives file path as string
-   File: src/pdf_to_english_py/app.py:87-88
+   File: app.py → handler()
    │
    ▼
 4. ocr.py encode_pdf_to_base64() reads file
-   File: src/pdf_to_english_py/ocr.py:28-41
+   File: ocr.py → encode_pdf_to_base64()
    │
    ▼
 5. BASE64 STRING sent to Mistral OCR API
    Format: "data:application/pdf;base64,{base64_pdf}"
-   File: src/pdf_to_english_py/ocr.py:110-118
+   File: ocr.py → extract_pdf()
    │
    ▼
 6. MISTRAL PROCESSES in cloud, returns JSON
@@ -103,13 +104,13 @@ tests/
    ▼
 7. OUTPUT PDF written to temp dir, then copied to /tmp/
    for Gradio download
-   File: src/pdf_to_english_py/app.py:109-112
+   File: app.py → handler()
 ```
 
 **Key code:**
 
 ```python
-# ocr.py:106-118
+# ocr.py → extract_pdf()
 base64_pdf = encode_pdf_to_base64(pdf_path)
 ocr_response = client.ocr.process(
     model="mistral-ocr-latest",
@@ -124,90 +125,12 @@ ocr_response = client.ocr.process(
 
 ---
 
-## Q2: Mistral OCR — Capabilities & What We're Using
+## Q2: How Do Images Work?
 
-### API Response Structure
-
-```json
-{
-  "pages": [{
-    "index": 0,
-    "markdown": "# Title...",              // ✅ USING
-    "dimensions": {"dpi": 200, "height": 2200, "width": 1700},  // ❌ NOT USING
-    "images": [{
-      "id": "img-0.jpeg",                  // ✅ Using
-      "image_base64": "data:...",          // ✅ Using
-      "top_left_x": 100,                   // ❌ NOT USING - bounding box
-      "top_left_y": 200,
-      "bottom_right_x": 500,
-      "bottom_right_y": 400
-    }],
-    "tables": [{"id": "tbl-0.html", "content": "<table>..."}],  // ✅ USING
-    "hyperlinks": ["https://..."],          // ❌ NOT USING*
-    "header": null,                        // ❌ NOT ENABLED
-    "footer": null                         // ❌ NOT ENABLED
-  }],
-  "model": "mistral-ocr-2512",
-  "usage_info": {"pages_processed": 2, "doc_size_bytes": 150000}
-}
-```
-
-### Feature Usage Table
-
-| Feature | Available | We Use | How to Enable |
-|---------|-----------|--------|---------------|
-| Text extraction (markdown) | ✅ | ✅ | Default |
-| Table extraction (HTML) | ✅ | ✅ | `table_format="html"` |
-| Image extraction (base64) | ✅ | ✅ | `include_image_base64=True` |
-| **Header extraction** | ✅ | ❌ | Add `extract_header=True` |
-| **Footer extraction** | ✅ | ❌ | Add `extract_footer=True` |
-| **Hyperlinks*** | ✅ | ❌ | Capture `page.hyperlinks` |
-| **Image bounding boxes** | ✅ | ❌ | Use `top_left_x/y`, `bottom_right_x/y` |
-| **Page dimensions** | ✅ | ❌ | Use `page.dimensions.dpi/height/width` |
-| **Batch processing** | ✅ | ❌ | Use Batch API (50% cheaper) |
-| **Cloud file upload** | ✅ | ❌ | Use `client.files.upload()` instead of base64 |
-
-*`hyperlinks` captures PDF hyperlink annotations only, not URL text.
-
-### What's MISSING for Style Matching
-
-❌ Font family, size, weight
-❌ Text colour
-❌ Background colours
-❌ Text positioning (images have bounding boxes, but text coordinates not provided)
-❌ Line spacing
-❌ Column layout info
-
-### What's AVAILABLE
-
-✅ Page dimensions (dpi, height, width)
-✅ Image bounding boxes (x, y coordinates)
-✅ Semantic structure (headers, paragraphs, lists)
-✅ Table structure with colspan/rowspan
-
-### Potential Improvements
-
-| Approach | Effort | Result |
-|----------|--------|--------|
-| **Better CSS in render.py** | Low | Nicer default typography, won't match original |
-| **Use page dimensions for margins** | Medium | Approximate original proportions |
-| **Position images using bbox** | Medium | Images in roughly correct positions |
-| **Extract styles with separate tool (e.g., pdfplumber)** | High | Could extract fonts/colours from original |
-| **Two-column detection** | High | Detect multi-column layout, render accordingly |
-| **Preserve hyperlinks** | Low | Pass links through to output document |
-| **Header/footer handling** | Medium | Extract separately to maintain document structure |
-| **Batch API for scale** | Medium | 50% cost reduction when processing multiple documents |
-
-**Current CSS is in:** `src/pdf_to_english_py/render.py:9-83`
-
----
-
-## Q3: How Do Images Work?
-
-```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              IMAGE FLOW                                          │
-└─────────────────────────────────────────────────────────────────────────────────┘
+```text
+┌──────────────────┐
+│ IMAGE FLOW       │
+└──────────────────┘
 
 1. MISTRAL OCR extracts images from PDF
    Returns: Base64 data URI + bounding box
@@ -225,7 +148,8 @@ ocr_response = client.ocr.process(
         becomes
    "![img-0.jpeg](data:image/jpeg;base64,/9j/4AAQ...)"
 
-   File: src/pdf_to_english_py/ocr.py:67-90
+   File: ocr.py → inline_images()
+   (Tables inlined similarly via inline_tables() in ocr.py)
    │
    ▼
 4. markdown-it-py CONVERTS to HTML:
@@ -241,7 +165,7 @@ ocr_response = client.ocr.process(
 **Key code:**
 
 ```python
-# ocr.py:80-89
+# ocr.py → inline_images()
 for image in images:
     image_id = image.get("id", "")
     image_base64 = image.get("image_base64", "")
@@ -253,11 +177,11 @@ for image in images:
 
 ---
 
-## Q4: Translation Details
+## Q3: Translation Details
 
-### Where is the LLM Call?
+### 3A. Where is the LLM Call and Prompt?
 
-**File:** `src/pdf_to_english_py/translate.py:66-72`
+**File:** `src/pdf_to_english_py/translate.py`
 
 ```python
 response = client.chat.complete(
@@ -269,40 +193,13 @@ response = client.chat.complete(
 )
 ```
 
-Translation Prompt: `src/pdf_to_english_py/translate.py:5-36`
-
-### What Happens If Document Is Already English?
-
-**Current behaviour:** The LLM will still process it. It may:
-
-- Return the text mostly unchanged
-- Make minor "improvements" or rephrasings
-- Cost API tokens unnecessarily
-
-**Possible fix:** Add language detection before translation.
-
-### Can We Support German (or Other Languages)?
-
-**Yes, easily.** The function signature already supports it:
-
-```python
-def translate_markdown(
-    markdown: str,
-    client: Mistral,
-    source_lang: str = "French",   # ← Change this
-    target_lang: str = "English",  # ← Or this
-) -> str:
-```
-
-**To add German→English:** Just call with `source_lang="German"`
-
-**To expose in UI:** Add a dropdown in `app.py` for source language selection.
-
-### How Do We Protect Code From Translation?
+### 3B. How Do We Protect Code From Translation?
 
 **Current approach:** The prompt says "Do NOT translate URLs, file paths, or code"
 
 **Reliability:** This is best-effort by the LLM. It usually works but isn't guaranteed.
+
+**Token optimisation:** Before translation, `strip_images()` removes base64 image data (replacing with placeholders), then `restore_images()` re-inserts them after translation. This significantly reduces token usage. See `strip_images()` and `restore_images()` in translate.py.
 
 **More robust options:**
 
@@ -312,24 +209,95 @@ def translate_markdown(
 
 ---
 
-## Running the App
+## Q4: Mistral OCR — Visual Alignment Analysis
+
+This section documents what Mistral OCR provides that could improve visual alignment of translated PDFs. All outputs are single-column.
+
+### 4A. What We Currently Use
+
+| Data | Source | How Used | Code Location |
+|------|--------|----------|---------------|
+| `page.markdown` | OCR response | Main text content | `extract_pdf()` in ocr.py |
+| `page.images[].id` | OCR response | Match placeholders | `extract_pdf()` in ocr.py |
+| `page.images[].image_base64` | OCR response | Embed images inline | `extract_pdf()` in ocr.py |
+| `page.tables[].id` | OCR response | Match placeholders | `extract_pdf()` in ocr.py |
+| `page.tables[].content` | OCR response | Embed HTML tables | `extract_pdf()` in ocr.py |
+| `table_format="html"` | API param | Get tables as HTML | `extract_pdf()` in ocr.py |
+| `include_image_base64=True` | API param | Get base64 images | `extract_pdf()` in ocr.py |
+
+**Current rendering (render.py):**
+
+- A4 page (210mm × 297mm) with 10mm margins
+- sans-serif font, no padding
+- Images: hardcoded `width: 23.8%` (from prototype calculation, not dynamic)
+- Tables: collapsed borders, no explicit width
+
+### 4B. Available But Not Used — Visual Alignment Opportunities
+
+| Data | Available From | Visual Alignment Potential |
+|------|----------------|---------------------------|
+| **Page dimensions** | `page.dimensions.dpi`, `.width`, `.height` | Calculate aspect ratio, set output page size |
+| **Image bounding boxes** | `page.images[].top_left_x/y`, `.bottom_right_x/y` | Calculate image dimensions in pixels, set explicit width/height |
+| **Hyperlinks** | `page.hyperlinks[]` | URLs only (no anchor text mapping) - cannot recreate clickable links |
+| **Header content** | `page.header` (requires `extract_header=True`) | Separate header styling |
+| **Footer content** | `page.footer` (requires `extract_footer=True`) | Separate footer styling |
+
+### 4C. What Mistral OCR Does NOT Provide
+
+These styling attributes cannot be extracted from the OCR response:
+
+- ❌ Font family, size, weight
+- ❌ Text colour
+- ❌ Background colours
+- ❌ Text positioning/coordinates (only images have bounding boxes)
+- ❌ Line spacing
+- ❌ Column layout info (though it handles multi-column input)
+- ❌ Paragraph spacing
+
+### 4D. Actionable Improvements
+
+| Improvement | Effort | Impact | Implementation |
+|-------------|--------|--------|----------------|
+| **Set image dimensions from bbox** | Low | Images match original proportions | `extract_pdf()` must pass bbox to `inline_images()` (currently discarded in `extract_pdf()`), then add width/height to img tag |
+| **Use page DPI for image sizing** | Medium | More accurate image scaling | Read `page.dimensions.dpi`, adjust image sizes accordingly |
+| **Enable header/footer extraction** | Medium | Better document structure | Add `extract_header=True`, `extract_footer=True` to OCR call, style separately |
+
+**Note:** Hyperlinks cannot be preserved - the API returns URLs without anchor text mapping.
+
+### 4E. Investigation Script
+
+Verify OCR response structure (outputs dimensions, bounding boxes, hyperlinks without base64 data):
 
 ```bash
-# Install dependencies
-uv sync
-
-# Set API key
-echo "MISTRAL_API_KEY=your_key" > .env
-
-# Run app
-uv run python -m pdf_to_english_py.app
-# Opens at http://127.0.0.1:7860
-
-# Run tests
-uv run pytest -v                      # All tests
-uv run pytest -v -k "not integration" # Unit tests only (no API)
-uv run pytest -v -m integration       # Integration tests (needs API key)
+uv run scripts/investigate_ocr.py sample_pdfs/e2e_test.pdf
 ```
+
+Sample output (verified January 2026):
+
+```json
+{
+  "pages": [{
+    "index": 0,
+    "dimensions": {"dpi": 200, "width": 1654, "height": 2339},
+    "hyperlinks": ["https://www.google.com/", "https://claude.ai/new"],
+    "images": [{
+      "id": "img-0.jpeg",
+      "has_base64": true,
+      "top_left_x": 152, "top_left_y": 1656,
+      "bottom_right_x": 276, "bottom_right_y": 1779,
+      "width_px": 124, "height_px": 123
+    }],
+    "tables_count": 2
+  }]
+}
+```
+
+Key observations:
+
+- `dimensions`: Page size in pixels at given DPI (1654×2339 @ 200 DPI = A4)
+- `images`: Bounding box allows calculating pixel dimensions
+- `hyperlinks`: URLs only, no anchor text mapping
+- `tables`: Count only, no bounding box data
 
 ---
 
@@ -344,6 +312,8 @@ uv run pytest -v -m integration       # Integration tests (needs API key)
 | `tests/conftest.py` | Test fixtures |
 | `.env` | API key (not committed) |
 | `x_docs/SPEC.md` | Original requirements + hypothesis results |
+| `x_docs/docs_mistral_ocr.md` | Mistral OCR API documentation |
+| `scripts/investigate_ocr.py` | OCR response structure investigation |
 
 ---
 
@@ -355,7 +325,7 @@ uv run pytest -v -m integration       # Integration tests (needs API key)
 | 2 | Translation preserves structure | ✅ PASS |
 | 3 | Complex tables (colspan/rowspan) preserved | ✅ PASS |
 | 4 | Base64 images render in PDF | ✅ PASS |
-| 5 | Visual similarity to original | ⏳ Manual verification |
+| 5 | Visual similarity to original | 🫤 To be improved |
 
 ---
 

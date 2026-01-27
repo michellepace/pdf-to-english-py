@@ -15,18 +15,18 @@ from pdf_to_english_py.translate import translate_markdown
 
 
 @pytest.mark.integration
-def test_processes_french_pdf(
-    french_pdf: Path,
+def test_processes_multilingual_pdf(
+    e2e_test_pdf: Path,
     mistral_client: Mistral,
     tmp_path: Path,
 ) -> None:
-    """Should process French PDF through full pipeline with feature preservation.
+    """Should process multilingual PDF through full pipeline with feature preservation.
 
     Tests the complete OCR → translate → render pipeline, asserting that
     key document features are preserved throughout.
     """
     # Step 1: Extract text using OCR
-    ocr_result = extract_pdf(french_pdf, mistral_client)
+    ocr_result = extract_pdf(e2e_test_pdf, mistral_client)
 
     # Step 2: Translate to English
     translated_md = translate_markdown(ocr_result.raw_markdown, mistral_client)
@@ -57,10 +57,14 @@ def test_processes_french_pdf(
     # Special characters: Euro symbol should pass through
     assert "€" in translated_md, "Euro symbol (€) should be preserved"
 
-    # Translation: "RESSOURCES ET LIENS" should be translated to English
+    # Translation: French "Ressources et liens" should be translated to English
     assert "resources and links" in translated_md.lower(), (
         "French section header should be translated to English"
     )
+
+    # Translation: German "Die Sonne scheint" should be translated to English
+    # Check for "sun" as translation phrasing may vary (shines/shining/etc)
+    assert "sun" in translated_md.lower(), "German text should be translated to English"
 
     # === Risky assertions (OCR behaviour dependent) ===
 

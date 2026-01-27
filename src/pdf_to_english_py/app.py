@@ -22,7 +22,7 @@ def process_pdf(
     client: Mistral,
     output_dir: Path,
 ) -> tuple[str | None, str]:
-    """Process a French PDF and return translated English PDF.
+    """Process a PDF and return translated English PDF.
 
     Orchestrates the full translation pipeline:
     1. Extract text via OCR
@@ -30,7 +30,7 @@ def process_pdf(
     3. Render to PDF
 
     Args:
-        pdf_path: Path to the uploaded French PDF file.
+        pdf_path: Path to the uploaded PDF file.
         client: Mistral API client.
         output_dir: Directory for the output PDF.
 
@@ -122,7 +122,7 @@ def create_app() -> gr.Blocks:
         gr.Markdown("<br>")
         gr.Markdown("# PDF To English")
         gr.Markdown(
-            "Upload a French PDF and download an English translation.\n\n"
+            "Upload a PDF and download an English translation.\n\n"
             "Powered by Mistral OCR to extract text, tables, and images, "
             "Mistral Large for translation, then rendered back into a PDF."
         )
@@ -130,7 +130,7 @@ def create_app() -> gr.Blocks:
         with gr.Row():
             with gr.Column():
                 input_file = gr.File(
-                    label="Upload French PDF",
+                    label="Upload PDF",
                     file_types=[".pdf"],
                 )
                 translate_btn = gr.Button("Translate", variant="primary")

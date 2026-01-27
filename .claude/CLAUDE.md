@@ -8,11 +8,9 @@ Use British spelling throughout.
 
 Python prototype for Mistral OCR PDF translation pipeline. Exploring:
 
-- Mistral OCR 3 for text extraction from French PDFs
+- Mistral OCR 3 for text extraction from PDFs
 - Translation via Mistral Large
 - PDF generation with WeasyPrint
-
-This prototype informs the Next.js implementation at [pdf-to-english](https://github.com/michellepace/pdf-to-english).
 
 ## Project Structure
 
@@ -74,3 +72,7 @@ uv run ruff format                         # Format
 - **Ruff**: Linting (ALL rules enabled)
 - **Pyright**: Type checking (see [pyproject.toml](../pyproject.toml))
 - **Pre-commit**: Auto-runs on every commit
+
+## PDF Investigation
+
+Use `/pdf-investigate` skill for pypdf-based PDF comparison commands.

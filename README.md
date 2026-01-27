@@ -1,41 +1,67 @@
-# pdf-to-english-py
+# Prototype: PDF to English (Python)
 
-Prototype Mistral OCR pipeline for [pdf-to-english](https://github.com/michellepace/pdf-to-english).
+A Python Gradio app that translates PDFs to English using Mistral AI. Built as a prototype for [pdf-to-english](https://github.com/michellepace/pdf-to-english).
 
 ```text
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  French PDF │ ──> │ Mistral OCR │ ──> │  Translate  │ ──> │  Convert    │ ──> │ English PDF │
-└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
-       ↑             markdown+HTML      Mistral Large       markdown-it-py       WeasyPrint  ↓
-       ↑                                                                                     ↓
-  User Upload 🙂                                                              User Download 😁
+                    PIPELINE FLOW
+
+┌──────────────┐
+│     PDF      │  ← User uploads 🙂
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  Base64      │  app.py encodes file
+│  Encode      │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐     ┌─────────────────────┐ ⭐
+│  Mistral     │────>│ Returns:            │
+│  OCR API     │     │ • Markdown text     │
+└──────────────┘     │ • HTML tables       │
+       │             │ • Base64 images     │
+       │             └─────────────────────┘
+       ▼
+┌──────────────┐
+│  Inline      │  ocr.py replaces placeholders
+│  Assets      │  with actual table/image data
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐     ┌─────────────────────┐ ⭐
+│  Mistral     │────>│ Returns:            │
+│  Large API   │     │ • Translated MD     │
+└──────────────┘     │ • Structure intact  │
+       │             └─────────────────────┘
+       ▼
+┌──────────────┐
+│ markdown-it  │  MD → HTML                  ⭐
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│  WeasyPrint  │  HTML → PDF                 ⭐
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ English PDF  │  ← User downloads 😁
+└──────────────┘
 ```
 
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
 |------------|---------|
-| [Mistral OCR 3](https://docs.mistral.ai/capabilities/document/) | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
-| [Mistral Large](https://docs.mistral.ai/getting-started/models/models_overview/) | Translates markdown content while preserving formatting and structure. |
-| [markdown-it-py](https://github.com/executablebooks/markdown-it-py) | Converts markdown to HTML with passthrough for embedded HTML tables. |
-| [WeasyPrint](https://weasyprint.org/) | Renders HTML/CSS to PDF for the final translated document. |
+| [Mistral OCR 3](https://docs.mistral.ai/capabilities/document/) ⭐ | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
+| [Mistral Large](https://docs.mistral.ai/getting-started/models/models_overview/) ⭐ | Translates markdown content while preserving formatting and structure. |
+| [markdown-it-py](https://github.com/executablebooks/markdown-it-py) ⭐ | Converts markdown to HTML with passthrough for embedded HTML tables. |
+| [WeasyPrint](https://weasyprint.org/) ⭐ | Renders HTML/CSS to PDF for the final translated document. |
 | [Gradio](https://www.gradio.app/) | Provides the web interface for uploading and downloading PDFs. |
 | [Python 3.14+](https://www.python.org/) | Runtime with modern type hints and performance improvements. |
 
 **Dev tools:** pytest, ruff, pyright. Deployed on [Railway](https://railway.app/).
-
-## 📁 Project Structure
-
-| Path | Description |
-|------|-------------|
-| [.claude/](.claude/) | Claude Code configuration and project instructions |
-| .venv/ | Virtual environment created by `uv sync` (gitignored) |
-| [.vscode/](.vscode/) | IDE settings and recommended extensions |
-| [sample_pdfs/](sample_pdfs/) | Sample PDFs for testing (prefixed by language) |
-| [scripts/](scripts/) | CLI utilities for translation and profiling |
-| [src/pdf_to_english_py/](src/pdf_to_english_py/) | Core pipeline modules: ocr, translate, render, app |
-| [tests/](tests/) | Test files mirroring src/ structure |
-| [x_docs/](x_docs/) | Research documentation and specification |
 
 ## 📦 Installation
 
@@ -76,4 +102,17 @@ Prototype Mistral OCR pipeline for [pdf-to-english](https://github.com/michellep
 uv run python -m pdf_to_english_py.app
 ```
 
-This launches a Gradio web interface at `http://127.0.0.1:7860` where you can upload French PDFs and download English translations.
+This launches a Gradio web interface at `http://127.0.0.1:7860` where you can upload PDFs and download English translations.
+
+## 📁 Project Structure
+
+| Path | Description |
+|------|-------------|
+| [.claude/](.claude/) | Claude Code configuration and project instructions |
+| .venv/ | Virtual environment created by `uv sync` (gitignored) |
+| [.vscode/](.vscode/) | IDE settings and recommended extensions |
+| [sample_pdfs/](sample_pdfs/) | Sample PDFs for testing (prefixed by language) |
+| [scripts/](scripts/) | CLI utilities for translation and profiling |
+| [src/pdf_to_english_py/](src/pdf_to_english_py/) | Core pipeline modules: ocr, translate, render, app |
+| [tests/](tests/) | Test files mirroring src/ structure |
+| [x_docs/](x_docs/) | Research documentation and specification |
