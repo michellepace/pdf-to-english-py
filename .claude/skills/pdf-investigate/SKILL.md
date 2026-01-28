@@ -15,7 +15,7 @@ Use when validating visual alignment of output PDFs against source PDFs.
 ```bash
 uv run python -c "
 from pypdf import PdfReader
-for path in ['sample_pdfs/french.pdf', 'output_pdfs/french_EN.pdf']:
+for path in ['input_pdfs/french.pdf', 'output_pdfs/french_EN.pdf']:
     r = PdfReader(path)
     print(f'{path}: {len(r.pages)} pages')
     for i, p in enumerate(r.pages):
@@ -49,7 +49,7 @@ uv run python -c "
 from pypdf import PdfReader
 import re
 
-for path in ['sample_pdfs/scale.pdf']:
+for path in ['input_pdfs/scale.pdf']:
     print(f'=== {path} ===')
     r = PdfReader(path)
     p = r.pages[0]

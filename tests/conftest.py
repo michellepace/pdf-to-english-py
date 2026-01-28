@@ -17,15 +17,15 @@ def project_root() -> Path:
 
 
 @pytest.fixture
-def sample_pdfs_dir(project_root: Path) -> Path:
-    """Path to sample PDFs directory."""
-    return project_root / "sample_pdfs"
+def input_pdfs_dir(project_root: Path) -> Path:
+    """Path to input PDFs directory."""
+    return project_root / "input_pdfs"
 
 
 @pytest.fixture
-def e2e_test_pdf(sample_pdfs_dir: Path) -> Path:
+def e2e_test_pdf(input_pdfs_dir: Path) -> Path:
     """Path to test PDF with tables, links, and pictures."""
-    pdf_path = sample_pdfs_dir / "e2e_test.pdf"
+    pdf_path = input_pdfs_dir / "e2e_test.pdf"
     if not pdf_path.exists():
         pytest.skip(f"Test PDF not found: {pdf_path}")
     return pdf_path

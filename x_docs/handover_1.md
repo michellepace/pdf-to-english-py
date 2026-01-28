@@ -1,6 +1,6 @@
 ---
 validated_against: All code as of commit a931d44
-validated_by: uv run scripts/investigate_ocr.py sample_pdfs/e2e_test.pdf
+validated_by: uv run scripts/investigate_ocr.py input_pdfs/e2e_test.pdf
 validated_date: 2026-01-27
 ---
 
@@ -68,7 +68,7 @@ src/pdf_to_english_py/
 └── render.py       # markdown-it-py + WeasyPrint PDF generation
 
 tests/
-├── conftest.py       # Shared fixtures (sample PDFs, Mistral client)
+├── conftest.py       # Shared fixtures (input PDFs, Mistral client)
 ├── test_ocr.py
 ├── test_translate.py
 ├── test_render.py
@@ -275,7 +275,7 @@ These styling attributes cannot be extracted from the OCR response:
 Verify OCR response structure (outputs dimensions, bounding boxes, hyperlinks without base64 data):
 
 ```bash
-uv run scripts/investigate_ocr.py sample_pdfs/e2e_test.pdf
+uv run scripts/investigate_ocr.py input_pdfs/e2e_test.pdf
 ```
 
 Sample Script Output:

@@ -38,7 +38,7 @@ For that which you determine would be advantages to use, consider these potentia
 After changes:
 
 1. Run `uv run pytest` — all tests pass
-2. Run the full pipeline on `sample_pdfs/cv.pdf`
+2. Run the full pipeline on `input_pdfs/cv.pdf`
 3. Compare output PDF dimensions to original
 4. Verify images are positioned closer to original locations
 

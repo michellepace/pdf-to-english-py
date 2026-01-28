@@ -13,9 +13,6 @@ dist/
 build/
 *.egg-info/
 
-# Output artifacts
-output_pdfs/
-
 # Development tools
 .pytest_cache/
 .ruff_cache/

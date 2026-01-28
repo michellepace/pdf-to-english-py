@@ -53,8 +53,8 @@ This prototype informs the Next.js implementation at [pdf-to-english](https://gi
 
 | File | Tests | Contains |
 |------|-------|----------|
-| `sample_pdfs/french-tables.pdf` | 1, 2, 3, 5 | Complex tables |
-| `sample_pdfs/newsletter-images.pdf` | 1, 2, 4, 5 | Embedded images |
+| `input_pdfs/french-tables.pdf` | 1, 2, 3, 5 | Complex tables |
+| `input_pdfs/newsletter-images.pdf` | 1, 2, 4, 5 | Embedded images |
 
 ---
 

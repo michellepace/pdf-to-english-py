@@ -31,12 +31,12 @@ For Output PDF:
 
 Visual Analysis (current state):
 
-- Input PDF `sample_pdfs/e2e_test.pdf`
+- Input PDF `input_pdfs/e2e_test.pdf`
 - Output PDF `output_pdfs/e2e_test_EN.pdf` (fails both success criteria)
 
 Metadata structure of what Mistral OCR actually returns
 
-- Run `uv run scripts/investigate_ocr.py sample_pdfs/e2e_test.pdf`
+- Run `uv run scripts/investigate_ocr.py input_pdfs/e2e_test.pdf`
 
 ## Important Notes
 
