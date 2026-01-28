@@ -1,0 +1,18 @@
+{
+    "mcpServers": {
+      "playwright": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["@playwright/mcp@latest", "--viewport-size", "1280x720"]
+      },
+      "exa": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "exa-mcp-server"],
+        "env": {
+          "EXA_API_KEY": "${API_KEY_MCP_EXA}"
+        }
+      }
+    }
+  }
+  
