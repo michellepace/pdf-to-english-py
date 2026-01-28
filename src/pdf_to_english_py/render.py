@@ -101,7 +101,7 @@ def generate_image_css(images: list[ImageMetadata]) -> str:
         # Escape quotes in image ID for CSS attribute selector
         safe_id = img.image_id.replace('"', '\\"')
         rules.append(
-            f'img[alt="{safe_id}"] {{ width: {img.width_percent}%; height: auto; }}'
+            f'img[alt="{safe_id}"] {{ width: {img.width_mm}mm; height: auto; }}'
         )
 
     return "\n".join(rules)

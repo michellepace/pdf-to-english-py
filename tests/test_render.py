@@ -288,17 +288,17 @@ class TestGenerateImageCss:
 
     def test_generates_css_for_single_image(self) -> None:
         """Should generate CSS rule for a single image."""
-        images = [ImageMetadata(image_id="img-0.jpeg", width_percent=23.8)]
+        images = [ImageMetadata(image_id="img-0.jpeg", width_mm=23.8)]
         css = generate_image_css(images)
 
         assert 'img[alt="img-0.jpeg"]' in css
-        assert "width: 23.8%;" in css
+        assert "width: 23.8mm;" in css
 
     def test_generates_css_for_multiple_images(self) -> None:
         """Should generate CSS rules for multiple images."""
         images = [
-            ImageMetadata(image_id="img-0.jpeg", width_percent=7.5),
-            ImageMetadata(image_id="img-1.jpeg", width_percent=54.8),
+            ImageMetadata(image_id="img-0.jpeg", width_mm=7.5),
+            ImageMetadata(image_id="img-1.jpeg", width_mm=54.8),
         ]
         css = generate_image_css(images)
 
@@ -316,7 +316,7 @@ class TestRenderPdfWithMetadata:
     def test_renders_pdf_with_image_sizing(self, tmp_path: Path) -> None:
         """Should render PDF with dynamic image sizing."""
         markdown = "![img-0.jpeg](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==)"
-        images = [ImageMetadata(image_id="img-0.jpeg", width_percent=30.0)]
+        images = [ImageMetadata(image_id="img-0.jpeg", width_mm=30.0)]
         output_path = tmp_path / "output.pdf"
 
         render_pdf(markdown, output_path, images=images)

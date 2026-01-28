@@ -32,7 +32,7 @@ class ImageMetadata:
     """Metadata for an image extracted from OCR, including sizing info."""
 
     image_id: str
-    width_percent: float
+    width_mm: float
 
     @classmethod
     def from_bounding_box(
@@ -40,7 +40,7 @@ class ImageMetadata:
         image_id: str,
         top_left_x: int,
         bottom_right_x: int,
-        page_width: int,
+        dpi: int,
     ) -> ImageMetadata:
         """Create ImageMetadata from bounding box coordinates.
 
@@ -48,14 +48,14 @@ class ImageMetadata:
             image_id: The image identifier (e.g. "img-0.jpeg").
             top_left_x: X coordinate of top-left corner.
             bottom_right_x: X coordinate of bottom-right corner.
-            page_width: Width of the page in pixels.
+            dpi: Resolution of the OCR scan in dots per inch.
 
         Returns:
-            ImageMetadata with calculated width_percent.
+            ImageMetadata with calculated width_mm.
         """
         width_px = bottom_right_x - top_left_x
-        width_percent = (width_px / page_width) * 100
-        return cls(image_id=image_id, width_percent=round(width_percent, 1))
+        width_mm = (width_px / dpi) * 25.4
+        return cls(image_id=image_id, width_mm=round(width_mm, 1))
 
 
 @dataclass
@@ -217,7 +217,7 @@ def extract_pdf(pdf_path: Path, client: Mistral) -> OcrResult:
                         image_id=img.id,
                         top_left_x=img.top_left_x,
                         bottom_right_x=img.bottom_right_x,
-                        page_width=page.dimensions.width,
+                        dpi=page.dimensions.dpi,
                     )
                     all_images.append(metadata)
 

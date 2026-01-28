@@ -149,21 +149,23 @@ class TestInlineImages:
 class TestImageMetadata:
     """Tests for ImageMetadata dataclass."""
 
-    def test_stores_image_id_and_width_percent(self) -> None:
-        """ImageMetadata should store image_id and width_percent."""
-        metadata = ImageMetadata(image_id="img-0.jpeg", width_percent=23.8)
+    def test_stores_image_id_and_width_mm(self) -> None:
+        """ImageMetadata should store image_id and width_mm."""
+        metadata = ImageMetadata(image_id="img-0.jpeg", width_mm=23.8)
         assert metadata.image_id == "img-0.jpeg"
-        assert metadata.width_percent == 23.8
+        assert metadata.width_mm == 23.8
 
-    def test_calculates_width_percent_from_bounding_box(self) -> None:
-        """Should calculate width_percent from bounding box coordinates."""
+    def test_calculates_width_mm_from_bounding_box(self) -> None:
+        """Should calculate width_mm from bounding box coordinates and DPI."""
+        # width_px = 276 - 152 = 124
+        # width_mm = (124 / 200) * 25.4 = 15.748
         metadata = ImageMetadata.from_bounding_box(
             image_id="img-0.jpeg",
             top_left_x=152,
             bottom_right_x=276,
-            page_width=1654,
+            dpi=200,
         )
-        assert metadata.width_percent == pytest.approx(7.5, rel=0.01)
+        assert metadata.width_mm == pytest.approx(15.7, rel=0.01)
 
 
 class TestOcrResultWithMetadata:
@@ -171,7 +173,7 @@ class TestOcrResultWithMetadata:
 
     def test_ocr_result_stores_image_metadata(self) -> None:
         """OcrResult should store image metadata."""
-        images = [ImageMetadata(image_id="img-0.jpeg", width_percent=7.5)]
+        images = [ImageMetadata(image_id="img-0.jpeg", width_mm=15.7)]
         result = OcrResult(pages=[], raw_markdown="", images=images)
         assert len(result.images) == 1
 

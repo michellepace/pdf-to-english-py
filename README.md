@@ -6,17 +6,17 @@ A Python Gradio app that translates PDFs to English using Mistral AI. Built as a
                     PIPELINE FLOW
 
 ┌──────────────┐
-│     PDF      │  ← User uploads 🙂
+│     PDF      │  ← 🙂 User uploads
 └──────┬───────┘
        │
        ▼
 ┌──────────────┐
-│  Base64      │  app.py encodes file
+│  Base64      │  ocr.py encodes file
 │  Encode      │
 └──────┬───────┘
        │
        ▼
-┌──────────────┐     ┌─────────────────────┐ ⭐
+┌──────────────┐     ┌─────────────────────┐ 🤖
 │  Mistral     │────>│ Returns:            │
 │  OCR API     │     │ • Markdown text     │
 └──────────────┘     │ • HTML tables       │
@@ -29,24 +29,25 @@ A Python Gradio app that translates PDFs to English using Mistral AI. Built as a
 └──────┬───────┘
        │
        ▼
-┌──────────────┐     ┌─────────────────────┐ ⭐
-│  Mistral     │────>│ Returns:            │
-│  Large API   │     │ • Translated MD     │
+┌──────────────┐     ┌─────────────────────┐ 🤖
+│  Mistral Lge │────>│ Returns:            │
+│  LLM API     │     │ • Translated MD     │
 └──────────────┘     │ • Structure intact  │
        │             └─────────────────────┘
+       │  (images stripped before, restored after)
        ▼
 ┌──────────────┐
-│ markdown-it  │  MD → HTML                  ⭐
+│ markdown-it  │  MD → HTML                  🔧
 └──────┬───────┘
        │
        ▼
 ┌──────────────┐
-│  WeasyPrint  │  HTML → PDF                 ⭐
+│  WeasyPrint  │  HTML → PDF                 🔧
 └──────┬───────┘
        │
        ▼
 ┌──────────────┐
-│ English PDF  │  ← User downloads 😁
+│ English PDF  │  ← 😁 User downloads
 └──────────────┘
 ```
 
@@ -54,10 +55,10 @@ A Python Gradio app that translates PDFs to English using Mistral AI. Built as a
 
 | Technology | Purpose |
 |------------|---------|
-| [Mistral OCR 3](https://docs.mistral.ai/capabilities/document/) ⭐ | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
-| [Mistral Large](https://docs.mistral.ai/getting-started/models/models_overview/) ⭐ | Translates markdown content while preserving formatting and structure. |
-| [markdown-it-py](https://github.com/executablebooks/markdown-it-py) ⭐ | Converts markdown to HTML with passthrough for embedded HTML tables. |
-| [WeasyPrint](https://weasyprint.org/) ⭐ | Renders HTML/CSS to PDF for the final translated document. |
+| [Mistral OCR 3](https://docs.mistral.ai/capabilities/document/) 🤖 | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
+| [Mistral Large LLM](https://docs.mistral.ai/getting-started/models/models_overview/) 🤖 | Translates markdown content while preserving formatting and structure. |
+| [markdown-it-py](https://github.com/executablebooks/markdown-it-py) 🔧 | Converts markdown to HTML with passthrough for embedded HTML tables. |
+| [WeasyPrint](https://weasyprint.org/) 🔧 | Renders HTML/CSS to PDF for the final translated document. |
 | [Gradio](https://www.gradio.app/) | Provides the web interface for uploading and downloading PDFs. |
 | [Python 3.14+](https://www.python.org/) | Runtime with modern type hints and performance improvements. |
 
@@ -109,7 +110,6 @@ This launches a Gradio web interface at `http://127.0.0.1:7860` where you can up
 | Path | Description |
 |------|-------------|
 | [.claude/](.claude/) | Claude Code configuration and project instructions |
-| .venv/ | Virtual environment created by `uv sync` (gitignored) |
 | [.vscode/](.vscode/) | IDE settings and recommended extensions |
 | [sample_pdfs/](sample_pdfs/) | Sample PDFs for testing (prefixed by language) |
 | [scripts/](scripts/) | CLI utilities for translation and profiling |

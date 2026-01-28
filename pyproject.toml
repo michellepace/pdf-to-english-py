@@ -103,3 +103,4 @@ max-complexity = 10
 markers = [
     "integration: tests that require external services (Mistral API)",
 ]
+log_cli_level = "WARNING"  # Suppress fontTools DEBUG/INFO noise from WeasyPrint
