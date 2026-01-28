@@ -10,6 +10,7 @@ Usage: uv run scripts/investigate_ocr.py <input.pdf>
 import json
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -54,7 +55,6 @@ for page in ocr_response.pages:
         if page.dimensions
         else None,
         "hyperlinks": list(page.hyperlinks) if page.hyperlinks else [],
-        "markdown_preview": page.markdown[:500] if page.markdown else None,
         "markdown_length": len(page.markdown) if page.markdown else 0,
         "images": [],
         "tables_count": len(page.tables) if page.tables else 0,
@@ -79,5 +79,26 @@ for page in ocr_response.pages:
             page_data["images"].append(img_data)  # type: ignore[union-attr]
 
     output["pages"].append(page_data)  # type: ignore[union-attr]
+
+# Save full markdown to temp file
+combined_markdown = "\n\n---\n\n".join(
+    page.markdown for page in ocr_response.pages if page.markdown
+)
+
+with tempfile.NamedTemporaryFile(
+    mode="w",
+    prefix=f"ocr_markdown_{input_path.stem}_",
+    suffix=".md",
+    delete=False,
+) as f:
+    f.write(combined_markdown)
+    temp_path = f.name
+
+line_count = combined_markdown.count("\n") + 1
+word_count = len(combined_markdown.split())
+
+print(f"\n✅ Full markdown saved to: {temp_path}")
+print(f"  Lines: {line_count}")
+print(f"  Words: {word_count}\n")
 
 print(json.dumps(output, indent=2))
