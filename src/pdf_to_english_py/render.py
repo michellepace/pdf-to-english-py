@@ -43,21 +43,96 @@ BASE_CSS = f"""
     font-style: italic;
 }}
 
+html {{
+    font-size: 14px;
+}}
+
 body {{
     font-family: "Atkinson Hyperlegible", sans-serif;
-    color: #222;
-    line-height: 1.1;
+    font-size: 1rem;
+    color: #141413;
+    line-height: 1.4;
     margin: 0;
     padding: 0;
 }}
 
+/* Vertical rhythm: consistent spacing */
+p, table, ul, ol, blockquote {{
+    margin: 0 0 0.75rem 0;
+}}
+
+h1:first-child {{
+    margin-top: 0;
+}}
+
+/* Type scale: Minor Third (1.200) shifted - h5 italic, h6 uppercase */
+h1 {{
+    font-size: 1.728rem; font-weight: 700;
+    line-height: 1.20; margin: 2.00rem 0 0.60rem 0;
+}}
+h2 {{
+    font-size: 1.440rem; font-weight: 700;
+    line-height: 1.20; margin: 1.50rem 0 0.50rem 0;
+}}
+h3 {{
+    font-size: 1.200rem; font-weight: 600;
+    line-height: 1.25; margin: 1.25rem 0 0.40rem 0;
+}}
+h4 {{
+    font-size: 1.000rem; font-weight: 600;
+    line-height: 1.30; margin: 1.00rem 0 0.35rem 0;
+}}
+h5 {{
+    font-size: 1.000rem; font-weight: 500;
+    line-height: 1.30; margin: 0.75rem 0 0.30rem 0;
+    font-style: italic;
+}}
+h6 {{
+    font-size: 1.000rem; font-weight: 400;
+    line-height: 1.30; margin: 0.50rem 0 0.25rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}}
+
+small {{ font-size: 0.833rem; }}
+
+/* Tables */
 table {{
     border-collapse: collapse;
 }}
 
 th, td {{
-    border: 1px solid #999;
+    font-size: 0.9rem;
+    border: 0.5px solid #999;
     padding: 4px;
+    line-height: 1.1;
+}}
+
+th {{
+    font-weight: 700;
+    background-color: #f0efeb;
+}}
+
+td {{
+    font-weight: 400;
+    background-color: #ffffff;
+}}
+
+/* Lists */
+ul, ol {{
+    padding-left: 2rem;
+}}
+
+li {{
+    margin: 0.25rem 0;
+}}
+
+/* Blockquotes */
+blockquote {{
+    margin: 0 0 0.75rem 1.5rem;
+    padding-left: 1rem;
+    border-left: 3px solid #ccc;
+    font-style: italic;
 }}
 """
 
@@ -78,7 +153,10 @@ def generate_page_css(page_dimensions: PageDimensions | None) -> str:
     else:
         width, height = DEFAULT_PAGE_SIZE
 
-    return f"@page {{ size: {width}mm {height}mm; margin: 10mm; }}"
+    return (
+        f"@page {{ size: {width}mm {height}mm; margin: 15mm 20mm; "
+        f"background: #faf9f5; }}"
+    )
 
 
 def generate_image_css(images: list[ImageMetadata]) -> str:
