@@ -12,6 +12,13 @@
         "env": {
           "EXA_API_KEY": "${API_KEY_MCP_EXA}"
         }
+      },
+      "gradio": {
+        "command": "npx",
+        "args": [
+          "mcp-remote",
+          "https://gradio-docs-mcp.hf.space/gradio_api/mcp/"
+        ]
       }
     }
   }
