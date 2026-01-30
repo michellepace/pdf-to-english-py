@@ -6,11 +6,17 @@ Use British spelling throughout.
 
 ## Project Purpose
 
-Python prototype for Mistral OCR PDF translation pipeline. Exploring:
+Python prototype for Mistral OCR PDF translation pipeline — extract text from PDFs, translate to English, generate styled PDF output.
 
-- Mistral OCR 3 for text extraction from PDFs
-- Translation via Mistral Large
-- PDF generation with WeasyPrint
+## Tech Stack
+
+- **Python 3.14+** with **uv** package manager
+- **Gradio 6.5.1** — web interface
+- **Mistral AI** — OCR (Mistral OCR 3) and translation (Mistral Large)
+- **WeasyPrint** — PDF generation from HTML/CSS
+- **Ruff** — linting and formatting
+- **Pyright** — type checking
+- **pytest** — testing
 
 ## Project Structure
 
@@ -36,12 +42,18 @@ uv tree                                    # Show installed dependencies
 uv lock --upgrade-package <pkg>            # Update specific package
 uv lock --upgrade && uv sync               # Update all packages and apply
 
+# Run the app
+uv run pdf-to-english                      # Launch Gradio web interface
+
 # Development
 uv run pre-commit run --all-files          # Quality checks
 uv run pytest                              # All tests
 uv run pytest -v tests/test_specific.py::test_function
 uv run ruff check --fix                    # Lint and auto-fix
 uv run ruff format                         # Format
+
+# Preview standalone `prototype.html` (for Playwright MCP viewing)
+uv run python -m http.server 8000          # Serves project root at http://localhost:8000
 ```
 
 ## Code Design Principles: Elegant Simplicity over Over-Engineered
@@ -72,7 +84,3 @@ uv run ruff format                         # Format
 - **Ruff**: Linting (ALL rules enabled)
 - **Pyright**: Type checking (see [pyproject.toml](../pyproject.toml))
 - **Pre-commit**: Auto-runs on every commit
-
-## PDF Investigation
-
-Use `/pdf-investigate` skill for pypdf-based PDF comparison commands.
