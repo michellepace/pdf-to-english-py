@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF To English</title>
+<style>
+  @font-face {
+    font-family: 'Atkinson Hyperlegible Next';
+    src: url('fonts/AtkinsonHyperlegibleNextVF-Variable.ttf') format('truetype');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:             #09090b;
+    --surface:        #18181b;
+    --surface-raised: #1c1c1f;
+    --border:         #27272a;
+    --border-subtle:  #1f1f23;
+    --text:           #DEDEDE;
+    --text-sub:       #9E9E9E;
+    --text-faint:     #5a5a5e;
+    --copper-50:      #FDF8F4;
+    --copper-300:     #E0B48E;
+    --copper-400:     #D4A27F;
+    --copper-500:     #C48B64;
+    --copper-600:     #AD7350;
+    --copper-700:     #8F5C3D;
+    --copper-800:     #6E462F;
+    --copper-900:     #4D3121;
+    --copper-950:     #3A2418;
+
+    --font:        'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+    --fs-title:    2.074rem;
+    --fs-body:     1rem;
+    --fs-caption:  0.833rem;
+    --fs-micro:    0.694rem;
+    --lh:          1.5;
+    --space:       1.5rem;
+    --radius:      10px;
+    --radius-sm:   6px;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: var(--font);
+    font-size: var(--fs-body);
+    line-height: var(--lh);
+    color: var(--text);
+    background: var(--bg);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.022;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+  }
+
+  /* ── Dev Toolbar ── */
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(14, 14, 16, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.4rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .toolbar-label {
+    font-size: var(--fs-micro);
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: 0.25rem;
+  }
+  .toolbar button {
+    font-family: var(--font);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 0.2rem 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .toolbar button:hover {
+    color: var(--copper-400);
+    border-color: var(--copper-800);
+  }
+  .toolbar button.active {
+    color: var(--copper-300);
+    background: var(--copper-950);
+    border-color: var(--copper-700);
+  }
+
+  /* ── Main Container ── */
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: calc(var(--space) * 2.5) var(--space) calc(var(--space) * 4);
+  }
+
+  /* ── Header ── */
+  .header {
+    margin-bottom: calc(var(--space) * 2);
+  }
+  .header h1 {
+    font-size: var(--fs-title);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: var(--text);
+  }
+  .header p {
+    margin-top: calc(var(--space) * 0.4);
+    color: var(--text-sub);
+    font-size: var(--fs-body);
+  }
+
+  /* ── Section spacing ── */
+  .section {
+    margin-bottom: var(--space);
+  }
+
+  /* ── Labels ── */
+  .field-label {
+    display: block;
+    font-size: var(--fs-caption);
+    color: var(--text-sub);
+    margin-bottom: 0.4rem;
+    letter-spacing: 0.01em;
+  }
+
+  /* ── API Key Input ── */
+  .key-wrapper {
+    position: relative;
+  }
+  .key-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-faint);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+  .key-icon svg { width: 16px; height: 16px; }
+  .key-input {
+    width: 100%;
+    padding: 0.65rem 0.75rem 0.65rem 2.35rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font: inherit;
+    font-size: var(--fs-body);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .key-input::placeholder {
+    color: var(--text-faint);
+  }
+  .key-input:focus {
+    border-color: var(--copper-700);
+  }
+  .key-help {
+    margin-top: 0.35rem;
+    font-size: var(--fs-caption);
+    color: var(--text-faint);
+  }
+  .key-help a {
+    color: var(--copper-500);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .key-help a:hover {
+    color: var(--copper-300);
+  }
+
+  /* ── Upload Area ── */
+  .upload-zone {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+  }
+  .upload-zone:hover {
+    border-color: var(--copper-800);
+    background: #1a1815;
+  }
+
+  .upload-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 2.5rem 1rem;
+    color: var(--text-faint);
+  }
+  .upload-empty svg {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .upload-empty .upload-label {
+    font-size: var(--fs-body);
+    text-align: center;
+  }
+  .upload-empty .cta {
+    display: block;
+    color: var(--copper-500);
+    font-size: var(--fs-body);
+    margin-top: 0.15rem;
+  }
+
+  .upload-file {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 0.75rem;
+  }
+  .upload-file-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--copper-950);
+    display: grid;
+    place-items: center;
+    color: var(--copper-400);
+    flex-shrink: 0;
+  }
+  .upload-file-icon svg { width: 16px; height: 16px; }
+  .upload-file-name {
+    font-size: var(--fs-caption);
+    color: var(--text);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .upload-file-size {
+    font-size: var(--fs-micro);
+    color: var(--copper-400);
+    white-space: nowrap;
+  }
+  .upload-file-remove {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+  .upload-file-remove:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.05);
+  }
+  .upload-file-remove svg { width: 14px; height: 14px; }
+
+  /* ── Translate Button ── */
+  .translate-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--copper-500);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .translate-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .translate-btn:not(:disabled):hover {
+    background: var(--copper-600);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px -6px rgba(196, 139, 100, 0.3);
+  }
+  .translate-btn:not(:disabled):active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  .translate-btn:disabled {
+    cursor: not-allowed;
+  }
+  .translate-btn.disabled-empty {
+    opacity: 0.35;
+    background: var(--copper-800);
+  }
+  .translate-btn.disabled-processing {
+    opacity: 0.7;
+  }
+  .btn-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Status / Pipeline ── */
+  .status {
+    overflow: hidden;
+  }
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .stage {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-caption);
+    color: var(--text-faint);
+    transition: color 0.3s ease;
+    height: 1.5rem;
+  }
+  .stage.active { color: var(--copper-300); }
+  .stage.done   { color: var(--text-sub); }
+
+  .stage-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+  .stage.active .stage-dot {
+    background: var(--copper-500);
+    box-shadow: 0 0 6px rgba(196, 139, 100, 0.5);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  .stage.done .stage-dot { display: none; }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 4px rgba(196, 139, 100, 0.3); }
+    50%      { box-shadow: 0 0 10px rgba(196, 139, 100, 0.6); }
+  }
+
+  .stage-check {
+    display: none;
+    color: var(--copper-600);
+    flex-shrink: 0;
+  }
+  .stage-check svg { width: 14px; height: 14px; }
+  .stage.done .stage-check { display: flex; }
+
+  .complete-line {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+    font-size: var(--fs-caption);
+    color: var(--copper-300);
+    font-weight: 600;
+  }
+  .complete-line .check-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--copper-950);
+    display: grid;
+    place-items: center;
+    color: var(--copper-400);
+    flex-shrink: 0;
+  }
+  .complete-line .check-icon svg { width: 11px; height: 11px; }
+
+  /* ── Download Button (same slot as Translate) ── */
+  .download-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: transparent;
+    color: var(--copper-400);
+    border: 1.5px solid var(--copper-600);
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .download-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease;
+  }
+  .download-btn:hover {
+    background: var(--copper-500);
+    border-color: var(--copper-500);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px -6px rgba(196, 139, 100, 0.3);
+  }
+  .download-btn:hover svg {
+    transform: translateY(2px);
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    margin-top: calc(var(--space) * 2.5);
+    font-size: var(--fs-micro);
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
+    opacity: 0.6;
+  }
+
+  /* ── Visibility ── */
+  .hidden { display: none !important; }
+  .fade-enter {
+    animation: fadeUp 0.35s ease both;
+  }
+  .fade-enter-delayed {
+    animation: fadeUp 0.4s ease both;
+    animation-delay: 0.15s;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Dev Toolbar -->
+<nav class="toolbar" role="toolbar" aria-label="State switcher">
+  <span class="toolbar-label">State</span>
+  <button class="active" data-state="empty">Empty</button>
+  <button data-state="ready">Ready</button>
+  <button data-state="processing">Processing</button>
+  <button data-state="complete">Complete</button>
+</nav>
+
+<main class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <h1>PDF To English</h1>
+    <p>Upload a PDF, get English.</p>
+  </header>
+
+  <!-- API Key -->
+  <div class="section">
+    <label class="field-label" for="api-key">Mistral API Key</label>
+    <div class="key-wrapper">
+      <div class="key-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <input class="key-input" id="api-key" type="password" placeholder="sk-xxxxxxxxxxxxxxxx" autocomplete="off">
+    </div>
+    <div class="key-help">Need a key? <a href="https://admin.mistral.ai/organization/api-keys" target="_blank" rel="noopener">Get one free&nbsp;&rarr;</a></div>
+  </div>
+
+  <!-- Upload -->
+  <div class="section">
+    <label class="field-label">Upload PDF</label>
+    <div class="upload-zone" id="upload-zone">
+      <!-- Empty state -->
+      <div class="upload-empty" id="upload-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="upload-label">Drop PDF here<span class="cta">Click to upload</span></span>
+      </div>
+      <!-- File loaded state -->
+      <div class="upload-file hidden" id="upload-file">
+        <div class="upload-file-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span class="upload-file-name">test1.pdf</span>
+        <span class="upload-file-size">291.3 KB</span>
+        <button class="upload-file-remove" aria-label="Remove file">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Button (Translate ↔ Download — same slot) -->
+  <div class="section">
+    <button class="translate-btn disabled-empty" id="translate-btn" disabled>
+      <span id="btn-text">Translate</span>
+    </button>
+    <button class="download-btn hidden" id="download-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Download Translation</span>
+    </button>
+  </div>
+
+  <!-- Status -->
+  <div class="section status hidden" id="status-area">
+    <div class="pipeline" id="pipeline">
+      <div class="stage" id="s-ocr">
+        <div class="stage-dot"></div>
+        <div class="stage-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <span>Extracting text (OCR)&hellip;</span>
+      </div>
+      <div class="stage" id="s-translate">
+        <div class="stage-dot"></div>
+        <div class="stage-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <span>Translating to English&hellip;</span>
+      </div>
+      <div class="stage" id="s-render">
+        <div class="stage-dot"></div>
+        <div class="stage-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <span>Rendering PDF&hellip;</span>
+      </div>
+    </div>
+    <div class="complete-line hidden" id="complete-msg">
+      <div class="check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span>Translation complete!</span>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">Built by Michelle</div>
+
+</main>
+
+<script>
+(function() {
+  'use strict';
+
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+
+  const els = {
+    apiKey:       $('#api-key'),
+    uploadZone:   $('#upload-zone'),
+    uploadEmpty:  $('#upload-empty'),
+    uploadFile:   $('#upload-file'),
+    btn:          $('#translate-btn'),
+    btnText:      $('#btn-text'),
+    downloadBtn:  $('#download-btn'),
+    statusArea:   $('#status-area'),
+    pipeline:     $('#pipeline'),
+    completeMsg:  $('#complete-msg'),
+    stages:       ['s-ocr', 's-translate', 's-render'],
+  };
+
+  let pipelineTimer = null;
+  let elapsedTimer = null;
+  let elapsed = 0;
+
+  // ── State Machine ──
+  const states = {
+    empty: () => {
+      els.apiKey.value = '';
+      showUpload('empty');
+      showTranslateBtn('Translate', true, 'disabled-empty');
+      hideStatus();
+    },
+    ready: () => {
+      els.apiKey.value = 'sk-abcdef1234567890';
+      showUpload('file');
+      showTranslateBtn('Translate', false, '');
+      hideStatus();
+    },
+    processing: () => {
+      els.apiKey.value = 'sk-abcdef1234567890';
+      showUpload('file');
+      startProcessing();
+    },
+    complete: () => {
+      els.apiKey.value = 'sk-abcdef1234567890';
+      showUpload('file');
+      showDownloadBtn();
+      showComplete();
+    },
+  };
+
+  function showUpload(mode) {
+    if (mode === 'empty') {
+      els.uploadEmpty.classList.remove('hidden');
+      els.uploadFile.classList.add('hidden');
+    } else {
+      els.uploadEmpty.classList.add('hidden');
+      els.uploadFile.classList.remove('hidden');
+    }
+  }
+
+  function showTranslateBtn(text, disabled, extraClass) {
+    clearTimers();
+    // Remove any spinner
+    const spinner = els.btn.querySelector('.btn-spinner');
+    if (spinner) spinner.remove();
+
+    els.btn.classList.remove('hidden');
+    els.downloadBtn.classList.add('hidden');
+    els.btnText.textContent = text;
+    els.btn.disabled = disabled;
+    els.btn.className = 'translate-btn' + (extraClass ? ' ' + extraClass : '');
+  }
+
+  function showDownloadBtn() {
+    clearTimers();
+    // Remove any spinner from translate btn
+    const spinner = els.btn.querySelector('.btn-spinner');
+    if (spinner) spinner.remove();
+
+    els.btn.classList.add('hidden');
+    els.downloadBtn.classList.remove('hidden');
+    // Re-trigger fade animation
+    els.downloadBtn.classList.remove('fade-enter');
+    void els.downloadBtn.offsetWidth;
+    els.downloadBtn.classList.add('fade-enter');
+  }
+
+  function startProcessing() {
+    elapsed = 0;
+    els.btn.classList.remove('hidden');
+    els.downloadBtn.classList.add('hidden');
+    els.btn.className = 'translate-btn disabled-processing';
+    els.btn.disabled = true;
+
+    // Add spinner
+    let spinner = els.btn.querySelector('.btn-spinner');
+    if (!spinner) {
+      spinner = document.createElement('div');
+      spinner.className = 'btn-spinner';
+      els.btn.insertBefore(spinner, els.btnText);
+    }
+    els.btnText.textContent = 'Translating\u2026 0s';
+
+    // Elapsed counter
+    elapsedTimer = setInterval(() => {
+      elapsed++;
+      els.btnText.textContent = `Translating\u2026 ${elapsed}s`;
+    }, 1000);
+
+    // Show pipeline
+    els.statusArea.classList.remove('hidden');
+    els.statusArea.classList.add('fade-enter');
+    els.completeMsg.classList.add('hidden');
+
+    resetStages();
+    animatePipeline();
+  }
+
+  function resetStages() {
+    els.stages.forEach(id => {
+      document.getElementById(id).className = 'stage';
+    });
+  }
+
+  function animatePipeline() {
+    let step = 0;
+    function tick() {
+      els.stages.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (i < step) el.className = 'stage done';
+        else if (i === step) el.className = 'stage active';
+        else el.className = 'stage';
+      });
+      step++;
+      if (step > els.stages.length) step = 0;
+    }
+    tick();
+    pipelineTimer = setInterval(tick, 2200);
+  }
+
+  function showComplete() {
+    clearTimers();
+    els.statusArea.classList.remove('hidden');
+    els.completeMsg.classList.remove('hidden');
+    els.completeMsg.classList.add('fade-enter-delayed');
+
+    els.stages.forEach(id => {
+      document.getElementById(id).className = 'stage done';
+    });
+  }
+
+  function hideStatus() {
+    clearTimers();
+    els.statusArea.classList.add('hidden');
+    els.statusArea.classList.remove('fade-enter');
+    els.completeMsg.classList.add('hidden');
+    resetStages();
+  }
+
+  function clearTimers() {
+    clearInterval(pipelineTimer);
+    clearInterval(elapsedTimer);
+    pipelineTimer = null;
+    elapsedTimer = null;
+  }
+
+  // ── Wire Toolbar ──
+  const stateNames = Object.keys(states);
+  let currentIdx = 0;
+
+  $$('.toolbar button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.state;
+      switchTo(name);
+    });
+  });
+
+  function switchTo(name) {
+    currentIdx = stateNames.indexOf(name);
+    $$('.toolbar button').forEach(b =>
+      b.classList.toggle('active', b.dataset.state === name)
+    );
+    states[name]();
+  }
+
+  // Arrow key navigation
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight') {
+      currentIdx = (currentIdx + 1) % stateNames.length;
+      switchTo(stateNames[currentIdx]);
+    } else if (e.key === 'ArrowLeft') {
+      currentIdx = (currentIdx - 1 + stateNames.length) % stateNames.length;
+      switchTo(stateNames[currentIdx]);
+    }
+  });
+
+  // Init
+  switchTo('empty');
+})();
+</script>
+</body>
+</html>

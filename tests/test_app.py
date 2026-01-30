@@ -40,4 +40,4 @@ class TestProcessPdf:
         )
 
         assert output_path is None
-        assert "error" in status.lower()
+        assert "not found" in status.lower()
