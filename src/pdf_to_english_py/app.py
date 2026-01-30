@@ -25,6 +25,14 @@ from pdf_to_english_py.validate import (
 # Load environment variables from .env file
 load_dotenv()
 
+
+def api_key_default(railway_env: str | None, api_key: str | None) -> str:
+    """Return API key default for the UI: empty when deployed, key value locally."""
+    if railway_env:
+        return ""
+    return api_key or ""
+
+
 # Custom copper accent colour palette
 _COPPER = Color(
     c50="#FDF8F4",
@@ -205,7 +213,10 @@ def create_app() -> gr.Blocks:
                 api_key_input = gr.Textbox(
                     label="Mistral Key",
                     placeholder="Enter your Mistral API key",
-                    value=os.environ.get("MISTRAL_API_KEY", ""),
+                    value=api_key_default(
+                        os.environ.get("RAILWAY_ENVIRONMENT_NAME"),
+                        os.environ.get("MISTRAL_API_KEY"),
+                    ),
                 )
                 gr.Markdown(
                     "Need a key? "

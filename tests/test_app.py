@@ -7,7 +7,27 @@ import gradio as gr
 if TYPE_CHECKING:
     from pathlib import Path
 
-from pdf_to_english_py.app import create_app, process_pdf
+from pdf_to_english_py.app import api_key_default, create_app, process_pdf
+
+
+class TestApiKeyDefault:
+    """Tests for api_key_default function."""
+
+    def test_returns_empty_when_deployed(self) -> None:
+        """Should return empty string when Railway environment is set."""
+        assert api_key_default("production", "sk-secret-key") == ""
+
+    def test_returns_api_key_locally(self) -> None:
+        """Should return API key when not deployed."""
+        assert api_key_default(None, "sk-secret-key") == "sk-secret-key"
+
+    def test_returns_empty_when_no_key_locally(self) -> None:
+        """Should return empty string when no key is available locally."""
+        assert api_key_default(None, None) == ""
+
+    def test_returns_empty_when_deployed_without_key(self) -> None:
+        """Should return empty string when deployed with no key."""
+        assert api_key_default("production", None) == ""
 
 
 class TestCreateApp:
