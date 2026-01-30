@@ -115,7 +115,7 @@ uv run python scripts/pipeline_timing.py input_pdfs/e2e_test.pdf
 ## 🚀 Running the Application
 
 ```bash
-uv run python -m pdf_to_english_py.app
+uv run pdf-to-english
 ```
 
 This launches a Gradio web interface at `http://127.0.0.1:7860` where you can upload PDFs and download English translations.

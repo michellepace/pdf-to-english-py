@@ -2,7 +2,7 @@
 # Build System
 # =================================
 [build-system]
-requires = ["uv_build>=0.9.8,<0.10.0"]
+requires = ["uv_build>=0.9.26,<0.10.0"]
 build-backend = "uv_build"
 
 
@@ -17,12 +17,15 @@ readme = "README.md"
 authors = [{ name = "Michelle" }]
 requires-python = ">=3.14"
 dependencies = [
-    "gradio>=5.0.0",
+    "gradio>=6.5.1",
     "markdown-it-py>=4.0.0",
-    "mistralai>=1.10.1",
+    "mistralai>=1.11.1",
     "python-dotenv>=1.2.1",
     "weasyprint>=68.0",
 ]
+
+[project.scripts]
+pdf-to-english = "pdf_to_english_py.app:main"
 
 [dependency-groups]
 dev = [
@@ -55,13 +58,11 @@ reportDuplicateImport = false   # Ruff F811 handles it
 # Ruff Linter Configuration
 # =================================
 [tool.ruff]
-# Strictest ruff settings
 line-length = 88
 target-version = "py314"
 
 [tool.ruff.lint]
-# Enable all available rules
-select = ["ALL"]
+select = ["ALL"]  # Strictest: enable all available rules
 # Only ignore rules that are incompatible or overly pedantic
 ignore = [
     "D100",    # Missing docstring in public module

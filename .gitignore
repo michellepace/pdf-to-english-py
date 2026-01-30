@@ -16,6 +16,7 @@ build/
 # Development tools
 .pytest_cache/
 .ruff_cache/
+.playwright-mcp
 
 # Operating system
 .DS_Store
