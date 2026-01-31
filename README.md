@@ -2,6 +2,20 @@
 
 A Python Gradio app that translates PDFs to English using Mistral AI. Built as a prototype for [pdf-to-english](https://github.com/michellepace/pdf-to-english).
 
+<div align="center">
+  <a href="https://pdf-to-english-prototype.up.railway.app/">
+    <img src="x_docs/images/app_screenshot.jpg" alt="Dark-themed Gradio interface with Upload PDF drop zone on the left, Download English PDF output (formulaire_médical_english.pdf, 51.3 KB) on the right, completed progress steps: Extracting text (OCR), Translating to English, Rendering PDF, Translation complete. Below: Mistral Key input field with 'Get one free' link, and a copper-coloured Convert To English button." width="914">
+  </a>
+  <p><em>Try it live on Railway (click image)</em></p>
+</div>
+
+<div align="center">
+  <img src="x_docs/images/ocr_form.jpg" alt="Mistral OCR form understanding: scanned historical form on the left, extracted structured text on the right with PDF and Markdown output tabs. 2169 characters extracted from a single page." width="914">
+  <p><em>Mistral OCR extracting structured text from a scanned form — non-English documents are translated to English</em></p>
+</div>
+
+## 🔄 PDF Pipeline Flow
+
 ```text
                     PIPELINE FLOW
 
@@ -51,7 +65,7 @@ A Python Gradio app that translates PDFs to English using Mistral AI. Built as a
 └──────────────┘
 ```
 
-## ⏱️ Pipeline Timing
+## ⏱️ PDF Pipeline Timing
 
 Example timing on [input_pdfs/e2e_test.pdf](input_pdfs/e2e_test.pdf) — a 2-page, multi-language test PDF with tables and images (127 KB):
 
@@ -124,7 +138,7 @@ This launches a Gradio web interface at `http://127.0.0.1:7860` where you can up
 
 | Technology | Purpose |
 |------------|---------|
-| [Mistral OCR 3](https://docs.mistral.ai/capabilities/document/) 🤖 | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
+| [Mistral OCR 3](https://docs.mistral.ai/capabilities/document_ai/basic_ocr) 🤖 | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
 | [Mistral Large LLM](https://docs.mistral.ai/getting-started/models/models_overview/) 🤖 | Translates markdown content while preserving formatting and structure. |
 | [markdown-it-py](https://github.com/executablebooks/markdown-it-py) 🔧 | Converts markdown to HTML with passthrough for embedded HTML tables. |
 | [WeasyPrint](https://weasyprint.org/) 🔧 | Renders HTML/CSS to PDF for the final translated document. |
