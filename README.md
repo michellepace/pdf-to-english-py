@@ -14,6 +14,8 @@ A Python Gradio app that translates PDFs to English using Mistral AI. Built as a
   <p><em>Mistral OCR extracting structured text from a scanned form — non-English documents are translated to English</em></p>
 </div>
 
+See [`input_pdfs/`](input_pdfs/) for test PDFs and [`output_pdfs/`](output_pdfs/) for their processed output.
+
 ## 🔄 PDF Pipeline Flow
 
 ```text
@@ -154,7 +156,7 @@ This launches a Gradio web interface at `http://127.0.0.1:7860` where you can up
 | [.claude/](.claude/) | Claude Code configuration and project instructions |
 | [.vscode/](.vscode/) | IDE settings and recommended extensions |
 | [input_pdfs/](input_pdfs/) | Input PDFs for testing (prefixed by language) |
-| [output_pdfs/](output_pdfs/) | Translated PDF output from pipeline |
+| [output_pdfs/](output_pdfs/) | Processed PDF output from pipeline |
 | [scripts/](scripts/) | CLI utilities for translation and profiling |
 | [src/pdf_to_english_py/](src/pdf_to_english_py/) | Core pipeline modules: ocr, translate, render, app |
 | [tests/](tests/) | Test files mirroring src/ structure |
