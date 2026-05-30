@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from mistralai import Mistral
+    from mistralai.client import Mistral
 
 
 @dataclass

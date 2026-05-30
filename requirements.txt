@@ -19,11 +19,8 @@ certifi==2026.1.4
     # via
     #   httpcore
     #   httpx
-    #   requests
 cffi==2.0.0
     # via weasyprint
-charset-normalizer==3.4.4
-    # via requests
 click==8.3.1
     # via
     #   typer
@@ -43,8 +40,6 @@ fsspec==2026.1.0
     # via
     #   gradio-client
     #   huggingface-hub
-googleapis-common-protos==1.72.0
-    # via opentelemetry-exporter-otlp-proto-http
 gradio==6.15.2
     # via pdf-to-english-py (pyproject.toml)
 gradio-client==2.5.0
@@ -78,13 +73,12 @@ idna==3.11
     # via
     #   anyio
     #   httpx
-    #   requests
 importlib-metadata==8.7.1
     # via opentelemetry-api
-invoke==2.2.1
-    # via mistralai
 jinja2==3.1.6
     # via gradio
+jsonpath-python==1.1.6
+    # via mistralai
 markdown-it-py==4.2.0
     # via
     #   pdf-to-english-py (pyproject.toml)
@@ -95,32 +89,18 @@ markupsafe==3.0.3
     #   jinja2
 mdurl==0.1.2
     # via markdown-it-py
-mistralai==1.12.4
+mistralai==2.4.8
     # via pdf-to-english-py (pyproject.toml)
 numpy==2.4.1
     # via
     #   gradio
     #   pandas
-opentelemetry-api==1.38.0
+opentelemetry-api==1.39.1
     # via
     #   mistralai
-    #   opentelemetry-exporter-otlp-proto-http
-    #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
-opentelemetry-exporter-otlp-proto-common==1.38.0
-    # via opentelemetry-exporter-otlp-proto-http
-opentelemetry-exporter-otlp-proto-http==1.38.0
+opentelemetry-semantic-conventions==0.60b1
     # via mistralai
-opentelemetry-proto==1.38.0
-    # via
-    #   opentelemetry-exporter-otlp-proto-common
-    #   opentelemetry-exporter-otlp-proto-http
-opentelemetry-sdk==1.38.0
-    # via
-    #   mistralai
-    #   opentelemetry-exporter-otlp-proto-http
-opentelemetry-semantic-conventions==0.59b0
-    # via opentelemetry-sdk
 orjson==3.11.5
     # via gradio
 packaging==26.0
@@ -134,10 +114,6 @@ pillow==12.1.0
     # via
     #   gradio
     #   weasyprint
-protobuf==6.33.4
-    # via
-    #   googleapis-common-protos
-    #   opentelemetry-proto
 pycparser==3.0
     # via cffi
 pydantic==2.12.5
@@ -171,9 +147,6 @@ pyyaml==6.0.3
     # via
     #   gradio
     #   huggingface-hub
-    #   mistralai
-requests==2.32.5
-    # via opentelemetry-exporter-otlp-proto-http
 rich==14.3.1
     # via typer
 safehttpx==0.1.7
@@ -213,8 +186,6 @@ typing-extensions==4.15.0
     #   gradio-client
     #   huggingface-hub
     #   opentelemetry-api
-    #   opentelemetry-exporter-otlp-proto-http
-    #   opentelemetry-sdk
     #   opentelemetry-semantic-conventions
     #   pydantic
     #   pydantic-core
@@ -228,8 +199,6 @@ typing-inspection==0.4.2
     #   pydantic
 tzdata==2025.3
     # via pandas
-urllib3==2.6.3
-    # via requests
 uvicorn==0.40.0
     # via gradio
 weasyprint==68.1

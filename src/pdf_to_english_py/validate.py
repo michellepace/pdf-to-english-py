@@ -1,7 +1,7 @@
 """Validation functions for API key and input checks."""
 
-from mistralai import Mistral
-from mistralai.models import NoResponseError, SDKError
+from mistralai.client import Mistral
+from mistralai.client.errors import NoResponseError, SDKError
 
 
 def validate_api_key_format(api_key: str) -> bool:

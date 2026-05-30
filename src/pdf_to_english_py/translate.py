@@ -4,7 +4,7 @@ import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from mistralai import Mistral
+    from mistralai.client import Mistral
 
 TRANSLATION_SYSTEM_PROMPT = """\
 You are a professional translator specialising in document translation.
@@ -111,8 +111,9 @@ def translate_markdown(
         ],
     )
 
-    # Extract the translated content
-    content = response.choices[0].message.content
+    # Extract the translated content (message may be None in the SDK types)
+    message = response.choices[0].message
+    content = message.content if message else None
     if isinstance(content, str):
         # Restore base64 images after translation
         return restore_images(content, images)

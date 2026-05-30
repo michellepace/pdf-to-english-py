@@ -14,7 +14,7 @@ import tempfile
 from pathlib import Path
 
 from dotenv import load_dotenv
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 from pdf_to_english_py.ocr import encode_pdf_to_base64
 
