@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 Use British spelling throughout.
 
 ## Project Purpose
@@ -11,12 +9,14 @@ Python prototype for Mistral OCR PDF translation pipeline — extract text from 
 ## Tech Stack
 
 - **Python 3.14+** with **uv** package manager
-- **Gradio 6.5.1** — web interface
-- **Mistral AI** — OCR (Mistral OCR 3) and translation (Mistral Large)
+- **Gradio** — web interface
+- **Mistral AI** — OCR (`mistral-ocr-latest`) and translation (`mistral-large-latest`)
 - **WeasyPrint** — PDF generation from HTML/CSS
-- **Ruff** — linting and formatting
+- **Ruff** — linting (ALL rules enabled) and formatting
 - **Pyright** — type checking
 - **pytest** — testing
+
+Quality config lives in `pyproject.toml`; pre-commit runs Ruff, Pyright, and pytest on every commit.
 
 ## Project Structure
 
@@ -32,7 +32,7 @@ UV-based Python 3.14+ with TDD workflow:
 
 - Use `uv run` — never activate venv
 - Use `uv add` — never pip
-- Use `pyproject.toml` — never requirements.txt
+- Use `pyproject.toml` — never hand-edit `requirements.txt` (auto-generated for Railway)
 
 ```bash
 # Setup & Dependencies
@@ -51,10 +51,20 @@ uv run pytest                              # All tests
 uv run pytest -v tests/test_specific.py::test_function
 uv run ruff check --fix                    # Lint and auto-fix
 uv run ruff format                         # Format
-
-# Preview standalone `prototype.html` (for Playwright MCP viewing)
-uv run python -m http.server 8000          # Serves project root at http://localhost:8000
 ```
+
+## Deployment (Railway)
+
+Auto-deploys from `main` on push. Builds from `requirements.txt`, which the
+`generate-requirements` pre-commit hook regenerates from `pyproject.toml`/`uv.lock`.
+
+```bash
+railway status              # deployment state + live URL
+railway logs --build        # confirm a deploy picked up the latest commit
+```
+
+- Live: <https://pdf-to-english-prototype.up.railway.app>
+- CLI is npm-based (`@railway/cli`), not a `uv` tool; `railway login` is interactive.
 
 ## Code Design Principles: Elegant Simplicity over Over-Engineered
 
@@ -67,17 +77,17 @@ uv run python -m http.server 8000          # Serves project root at http://local
 **Key Architecture Guidelines**:
 
 - **Layer separation** - CLI → business logic → I/O
-- **One module, one purpose** - Each `.py` file has a clear, focused role
+- **One module, one purpose** - each `.py` file has one clear role
 - **Handle errors at boundaries** - Catch exceptions in CLI layer, not business logic
 - **Type hints required** - All function signatures need type annotations
-- **Descriptive naming** - Functions/variables should clearly indicate purpose and be consistent throughout
+- **Descriptive naming** - names clearly indicate purpose, consistent throughout
 
 ## TDD Implementation
 
 - Use pytest's `tmp_path` fixture to avoid creating test files
-- Avoid mocks as they introduce unnecessary complexity
+- Avoid mocks - they add unnecessary complexity
 - Test incrementally: One test should drive one behaviour
-- Use focused test names that describe what's being tested
+- Focused test names that describe the behaviour
 
 ## Code Quality Standards
 
