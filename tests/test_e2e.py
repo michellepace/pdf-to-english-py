@@ -7,7 +7,7 @@ import pytest
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from mistralai import Mistral
+    from mistralai.client import Mistral
 
 from pdf_to_english_py.ocr import extract_pdf
 from pdf_to_english_py.render import render_pdf

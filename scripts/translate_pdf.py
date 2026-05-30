@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 from pdf_to_english_py.ocr import extract_pdf
 from pdf_to_english_py.render import render_pdf

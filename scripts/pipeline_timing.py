@@ -13,12 +13,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, ParamSpec, TypeVar
 
 from dotenv import load_dotenv
-from mistralai import Mistral
+from mistralai.client import Mistral
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from mistralai.models import OCRResponse
+    from mistralai.client.models import OCRResponse
 
 from pdf_to_english_py.ocr import (
     OcrPage,
