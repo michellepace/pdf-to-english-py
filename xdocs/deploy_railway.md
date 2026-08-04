@@ -1,6 +1,4 @@
-# Deployment Options
-
-## Railway
+# Deployment Gradio on Railway
 
 Railway auto-detects Python projects. The key configuration is binding Gradio to all network interfaces (it defaults to localhost only).
 
@@ -39,40 +37,3 @@ demo.launch(
 
 - [Railway Support Forum: Running a Gradio app](https://station.railway.com/questions/running-an-app-built-using-gradio-36279073)
 - [Deploy Gradio on Railway (Medium, Dec 2025)](https://medium.com/@kumaresankp21/deploy-your-gradio-app-on-railway-for-free-in-2025-complete-step-by-step-guide-0148b1bf73e0)
-
----
-
-## Hugging Face Spaces
-
-Hugging Face Spaces provides free, zero-configuration hosting for Gradio apps. It's the simplest deployment option for prototypes.
-
-**Setup:**
-
-1. Create a new Space at [huggingface.co/spaces](https://huggingface.co/spaces)
-2. Select "Gradio" as the SDK
-3. Push your code (or connect to GitHub)
-
-**Required files:**
-
-```
-your-project/
-├── app.py              # Your Gradio app (entry point)
-└── requirements.txt    # Dependencies
-```
-
-**Key Configuration — No special launch settings needed:**
-
-```python
-import gradio as gr
-
-demo = gr.Interface(...)
-
-demo.launch()  # HF Spaces handles host/port automatically
-```
-
-**Environment variables:** Set `MISTRAL_API_KEY` in Space Settings → Variables and Secrets.
-
-**References:**
-
-- [Gradio Quickstart: Sharing Your Demo](https://www.gradio.app/guides/quickstart#sharing-your-demo)
-- [Hugging Face Spaces Documentation](https://huggingface.co/docs/hub/spaces)

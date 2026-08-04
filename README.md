@@ -1,20 +1,20 @@
-# Prototype: PDF to English (Python)
+# Prototype: PDF to English
 
-A Python Gradio app that translates PDFs to English using Mistral AI. Built as a prototype for [pdf-to-english](https://github.com/michellepace/pdf-to-english).
+A quick spike to explore Mistral OCR: a Python Gradio app where you upload a PDF and download it translated into British English.
+
+<div align="center">
+  <img src="images/ocr_form.jpg" alt="Mistral OCR form understanding: scanned historical form on the left, extracted structured text on the right with PDF and Markdown output tabs. 2169 characters extracted from a single page." width="500">
+  <p><em>Mistral OCR extracting from a scanned PDF</em></p>
+</div>
 
 <div align="center">
   <a href="https://pdf-to-english-prototype.up.railway.app/">
-    <img src="x_docs/images/app_screenshot.jpg" alt="Dark-themed Gradio interface with Upload PDF drop zone on the left, Download English PDF output (formulaire_médical_english.pdf, 51.3 KB) on the right, completed progress steps: Extracting text (OCR), Translating to English, Rendering PDF, Translation complete. Below: Mistral Key input field with 'Get one free' link, and a copper-coloured Convert To English button." width="914">
+    <img src="images/app_screenshot.jpg" alt="Dark-themed Gradio interface with Upload PDF drop zone on the left, Download English PDF output (formulaire_médical_english.pdf, 51.3 KB) on the right, completed progress steps: Extracting text (OCR), Translating to English, Rendering PDF, Translation complete. Below: Mistral Key input field with 'Get one free' link, and a copper-coloured Convert To English button." width="500">
   </a>
-  <p><em>Try it live on Railway (click image)</em></p>
+  <p><em>Upload a PDF to translate to English (click image)</em></p>
 </div>
 
-<div align="center">
-  <img src="x_docs/images/ocr_form.jpg" alt="Mistral OCR form understanding: scanned historical form on the left, extracted structured text on the right with PDF and Markdown output tabs. 2169 characters extracted from a single page." width="914">
-  <p><em>Mistral OCR extracting structured text from a scanned form — non-English documents are translated to English</em></p>
-</div>
-
-See [`input_pdfs/`](input_pdfs/) for test PDFs and [`output_pdfs/`](output_pdfs/) for their processed output.
+The UI is simple, modelled on this [HTML mock-up](https://michellepace.github.io/pdf-to-english-py/mock-up/prototype.html). For examples, see [`input_pdfs/`](input_pdfs/) and their translations in [`output_pdfs/`](output_pdfs/).
 
 ## 🔄 PDF Pipeline Flow
 
@@ -139,7 +139,7 @@ This launches a Gradio web interface at `http://127.0.0.1:7860` where you can up
 ## 🛠️ Tech Stack
 
 | Technology | Purpose |
-|------------|---------|
+| ------------ | --------- |
 | [Mistral OCR 3](https://docs.mistral.ai/capabilities/document_ai/basic_ocr) 🤖 | Extracts text, tables, and images from PDFs as markdown with embedded HTML. |
 | [Mistral Large LLM](https://docs.mistral.ai/getting-started/models/models_overview/) 🤖 | Translates markdown content while preserving formatting and structure. |
 | [markdown-it-py](https://github.com/executablebooks/markdown-it-py) 🔧 | Converts markdown to HTML with passthrough for embedded HTML tables. |
@@ -152,7 +152,7 @@ This launches a Gradio web interface at `http://127.0.0.1:7860` where you can up
 ## 📁 Project Structure
 
 | Path | Description |
-|------|-------------|
+| ------ | ------------- |
 | [.claude/](.claude/) | Claude Code configuration and project instructions |
 | [.vscode/](.vscode/) | IDE settings and recommended extensions |
 | [input_pdfs/](input_pdfs/) | Input PDFs for testing (prefixed by language) |
