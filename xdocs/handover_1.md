@@ -222,7 +222,7 @@ This section documents what Mistral OCR provides that could improve visual align
 ### 4A. What We Currently Use
 
 | Data | Source | How Used | Code Location |
-|------|--------|----------|---------------|
+| ------ | -------- | ---------- | --------------- |
 | `page.markdown` | OCR response | Main text content | `extract_pdf()` in ocr.py |
 | `page.images[].id` | OCR response | Match placeholders | `extract_pdf()` in ocr.py |
 | `page.images[].image_base64` | OCR response | Embed images inline | `extract_pdf()` in ocr.py |
@@ -241,7 +241,7 @@ This section documents what Mistral OCR provides that could improve visual align
 ### 4B. Available But Not Used — Visual Alignment Opportunities
 
 | Data | Available From | Visual Alignment Potential |
-|------|----------------|---------------------------|
+| ------ | ---------------- | --------------------------- |
 | **Page dimensions** | `page.dimensions.dpi`, `.width`, `.height` | Calculate aspect ratio, set output page size |
 | **Image bounding boxes** | `page.images[].top_left_x/y`, `.bottom_right_x/y` | Calculate image dimensions in pixels, set explicit width/height |
 | **Hyperlinks** | `page.hyperlinks[]` | URLs only (no anchor text mapping) - cannot recreate clickable links |
@@ -263,7 +263,7 @@ These styling attributes cannot be extracted from the OCR response:
 ### 4D. Actionable Improvements
 
 | Improvement | Effort | Impact | Implementation |
-|-------------|--------|--------|----------------|
+| ------------- | -------- | -------- | ---------------- |
 | **Set image dimensions from bbox** | Low | Images match original proportions | `extract_pdf()` must pass bbox to `inline_images()` (currently discarded in `extract_pdf()`), then add width/height to img tag |
 | **Use page DPI for image sizing** | Medium | More accurate image scaling | Read `page.dimensions.dpi`, adjust image sizes accordingly |
 | **Enable header/footer extraction** | Medium | Better document structure | Add `extract_header=True`, `extract_footer=True` to OCR call, style separately |
@@ -337,7 +337,7 @@ Key observations:
 ## Files to Know
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `src/pdf_to_english_py/app.py` | Gradio UI, orchestrates pipeline |
 | `src/pdf_to_english_py/ocr.py` | Mistral OCR, asset inlining |
 | `src/pdf_to_english_py/translate.py` | Translation prompt + API call |
@@ -353,7 +353,7 @@ Key observations:
 ## Hypothesis Test Results
 
 | # | Hypothesis | Result |
-|---|------------|--------|
+| --- | ------------ | -------- |
 | 1 | markdown-it-py preserves HTML tables | ✅ PASS |
 | 2 | Translation preserves structure | ✅ PASS |
 | 3 | Complex tables (colspan/rowspan) preserved | ✅ PASS |

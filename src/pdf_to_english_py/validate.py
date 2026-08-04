@@ -42,8 +42,10 @@ def validate_api_key_with_mistral(api_key: str) -> tuple[bool, str, Mistral | No
     except NoResponseError:
         return (
             False,
-            "Could not reach Mistral API."
-            " Please check your internet connection and try again.",
+            (
+                "Could not reach Mistral API."
+                " Please check your internet connection and try again."
+            ),
             None,
         )
     except Exception:  # noqa: BLE001

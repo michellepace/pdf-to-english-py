@@ -2,7 +2,8 @@
 # Build System
 # =================================
 [build-system]
-requires = ["uv_build>=0.11.17,<0.12.0"]
+# Packaged for the [project.scripts] CLIs only; never published.
+requires = ["uv_build>=0.12.1,<0.13"]
 build-backend = "uv_build"
 
 
@@ -17,11 +18,11 @@ readme = "README.md"
 authors = [{ name = "Michelle" }]
 requires-python = ">=3.14"
 dependencies = [
-    "gradio>=6.15.2",
+    "gradio>=6.22.0",
     "markdown-it-py>=4.2.0",
-    "mistralai>=2.4.8",
+    "mistralai>=2.9.0",
     "python-dotenv>=1.2.2",
-    "weasyprint>=68.1",
+    "weasyprint>=69.0",
 ]
 
 [project.scripts]
@@ -29,11 +30,11 @@ pdf-to-english = "pdf_to_english_py.app:main"
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.6.0",
-    "pypdf>=6.12.2",
-    "pyright>=1.1.409",
-    "pytest>=9.0.3",
-    "ruff>=0.15.15",
+    "pre-commit>=4.6.1",
+    "pypdf>=6.14.2",
+    "pyright>=1.1.411",
+    "pytest>=9.1.1",
+    "ruff>=0.16.1",
 ]
 
 
@@ -70,6 +71,7 @@ ignore = [
     "D203",    # 1 blank line required before class docstring (conflicts with D211)
     "D213",    # Multi-line docstring summary should start at the second line (conflicts with D212)
     "COM812",  # Trailing comma missing (conflicts with formatter)
+    "CPY001",  # Missing copyright notice (unpublished)
     "ISC001",  # Implicitly concatenated string literals on one line (conflicts with formatter)
     "T201",    # Print found (allow print statements)
 ]
